@@ -1,0 +1,12 @@
+位操作：
+正数原码反码补码相同负数的补码+相反数的补码=2^n 
+除负数往右移动， 高位补l 之外，其他情况均在空位处补0
+
+
+tcp连接过程
+https请求过程
+
+集合相关
+List<? extents T>:put受限， super：get受限
+
+红黑树hashmap,concurrenthashmap源码

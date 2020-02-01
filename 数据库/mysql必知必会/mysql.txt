@@ -1,0 +1,5 @@
+mysql.user中的authentication_string 这一项代替password
+
+开启关闭Myslq服务
+net start mysql
+net stop mysql

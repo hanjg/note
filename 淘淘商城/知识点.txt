@@ -1,0 +1,19 @@
+maven的tomcat插件时debug
+
+spring和springmvc的父子容器
+
+spring mvc没有后缀的首页跳转过程
+
+httpclient使用
+
+2.1	访问taotao-portal服务406问题
+1、查看是否Jackson包是否存在。
+2、如果后缀是html是不能响应json数据的。需要修改后缀名。
+
+192.168.57.139 solr服务器
+
+visio可画流程图
+
+/item/152368174080783.html
+
+要把文本框中中的内容存到cookie里面，由于cookie是ASCLL编码方式，所以要把文本框中的内容编码到ascll，便于存到cookie

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>javax.xml.parsers.DocumentBuilder</OriginalElement>
+  <nodes>
+    <node x="24.0" y="162.0">com.sun.org.apache.xerces.internal.parsers.DOMParser</node>
+    <node x="0.0" y="81.0">com.sun.org.apache.xerces.internal.parsers.AbstractDOMParser</node>
+    <node x="46.21979166666668" y="243.0">com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderImpl</node>
+    <node x="132.28020833333335" y="0.0">org.w3c.dom.Document</node>
+    <node x="186.0" y="81.0">javax.xml.parsers.DocumentBuilder</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="com.sun.org.apache.xerces.internal.parsers.AbstractDOMParser" target="org.w3c.dom.Document">
+      <point x="41.5" y="-15.5" />
+      <point x="124.5" y="61.0" />
+      <point x="173.15520833333335" y="61.0" />
+      <point x="-13.625" y="15.5" />
+    </edge>
+    <edge source="com.sun.org.apache.xerces.internal.parsers.DOMParser" target="com.sun.org.apache.xerces.internal.parsers.AbstractDOMParser">
+      <point x="0.0" y="-15.5" />
+      <point x="0.0" y="15.5" />
+    </edge>
+    <edge source="com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderImpl" target="com.sun.org.apache.xerces.internal.parsers.DOMParser">
+      <point x="0.0" y="-15.5" />
+      <point x="134.21979166666668" y="223.0" />
+      <point x="122.33333333333334" y="223.0" />
+      <point x="39.33333333333334" y="15.5" />
+    </edge>
+    <edge source="com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderImpl" target="org.w3c.dom.Document">
+      <point x="70.4" y="-15.5" />
+      <point x="204.61979166666669" y="223.0" />
+      <point x="346.5" y="223.0" />
+      <point x="346.5" y="51.0" />
+      <point x="227.65520833333335" y="51.0" />
+      <point x="40.875" y="15.5" />
+    </edge>
+    <edge source="com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderImpl" target="javax.xml.parsers.DocumentBuilder">
+      <point x="35.20000000000002" y="-15.5" />
+      <point x="169.4197916666667" y="213.0" />
+      <point x="261.0" y="213.0" />
+      <point x="0.0" y="15.5" />
+    </edge>
+    <edge source="javax.xml.parsers.DocumentBuilder" target="org.w3c.dom.Document">
+      <point x="0.0" y="-15.5" />
+      <point x="261.0" y="61.0" />
+      <point x="200.40520833333335" y="61.0" />
+      <point x="13.625" y="15.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="212.5" y="139.0" />
+  <SelectedNodes />
+  <Categories />
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

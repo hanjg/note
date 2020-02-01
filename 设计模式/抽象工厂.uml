@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>com.mysql.jdbc.ConnectionImpl</OriginalElement>
+  <nodes>
+    <node x="271.0" y="324.0">com.mchange.v2.c3p0.impl.NewProxyCallableStatement</node>
+    <node x="0.0" y="562.0">com.mysql.jdbc.MySQLConnection</node>
+    <node x="207.0952380952381" y="562.0">com.mchange.v2.c3p0.impl.NewProxyConnection</node>
+    <node x="743.0" y="324.0">com.mchange.v2.c3p0.impl.NewProxyStatement</node>
+    <node x="186.0" y="400.0">java.sql.Connection</node>
+    <node x="69.0" y="324.0">com.mysql.jdbc.CallableStatement</node>
+    <node x="26.5" y="243.0">com.mysql.jdbc.PreparedStatement</node>
+    <node x="218.79166666666663" y="162.0">java.sql.PreparedStatement</node>
+    <node x="20.5" y="481.0">com.mysql.jdbc.Connection</node>
+    <node x="155.5" y="481.0">com.mchange.v2.c3p0.C3P0ProxyConnection</node>
+    <node x="13.0" y="81.0">com.mysql.jdbc.Statement</node>
+    <node x="576.0" y="243.0">com.mchange.v2.c3p0.C3P0ProxyStatement</node>
+    <node x="7.5" y="643.0">com.mysql.jdbc.ConnectionImpl</node>
+    <node x="422.75" y="0.0">java.sql.Statement</node>
+    <node x="208.5" y="243.0">java.sql.CallableStatement</node>
+    <node x="0.0" y="162.0">com.mysql.jdbc.StatementImpl</node>
+    <node x="503.0" y="324.0">com.mchange.v2.c3p0.impl.NewProxyPreparedStatement</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="com.mchange.v2.c3p0.impl.NewProxyConnection" target="com.mchange.v2.c3p0.C3P0ProxyConnection">
+      <point x="-43.25" y="-15.5" />
+      <point x="250.3452380952381" y="537.0" />
+      <point x="243.5" y="537.0" />
+      <point x="0.0" y="15.5" />
+    </edge>
+    <edge source="com.mysql.jdbc.CallableStatement" target="java.sql.CallableStatement">
+      <point x="38.5" y="-15.5" />
+      <point x="184.5" y="304.0" />
+      <point x="247.0" y="304.0" />
+      <point x="-38.5" y="15.5" />
+    </edge>
+    <edge source="java.sql.PreparedStatement" target="java.sql.Statement">
+      <point x="0.0" y="-15.5" />
+      <point x="299.79166666666663" y="61.0" />
+      <point x="463.25" y="61.0" />
+      <point x="-13.5" y="15.5" />
+    </edge>
+    <edge source="com.mchange.v2.c3p0.impl.NewProxyPreparedStatement" target="com.mchange.v2.c3p0.C3P0ProxyStatement">
+      <point x="55.0" y="-15.5" />
+      <point x="668.0" y="304.0" />
+      <point x="660.5" y="304.0" />
+      <point x="0.0" y="15.5" />
+    </edge>
+    <edge source="com.mysql.jdbc.PreparedStatement" target="com.mysql.jdbc.StatementImpl">
+      <point x="-40.5" y="-15.5" />
+      <point x="0.0" y="15.5" />
+    </edge>
+    <edge source="com.mysql.jdbc.MySQLConnection" target="com.mysql.jdbc.Connection">
+      <point x="0.0" y="-15.5" />
+      <point x="0.0" y="15.5" />
+    </edge>
+    <edge source="com.mysql.jdbc.ConnectionImpl" target="com.mysql.jdbc.MySQLConnection">
+      <point x="0.0" y="-15.5" />
+      <point x="0.0" y="15.5" />
+    </edge>
+    <edge source="com.mysql.jdbc.Connection" target="java.sql.Connection">
+      <point x="0.0" y="-15.5" />
+      <point x="78.0" y="456.0" />
+      <point x="205.16666666666669" y="456.0" />
+      <point x="-38.33333333333334" y="15.5" />
+    </edge>
+    <edge source="java.sql.CallableStatement" target="java.sql.PreparedStatement">
+      <point x="0.0" y="-15.5" />
+      <point x="285.5" y="218.0" />
+      <point x="299.79166666666663" y="218.0" />
+      <point x="0.0" y="15.5" />
+    </edge>
+    <edge source="com.mchange.v2.c3p0.C3P0ProxyStatement" target="java.sql.Statement">
+      <point x="0.0" y="-15.5" />
+      <point x="660.5" y="61.0" />
+      <point x="490.25" y="61.0" />
+      <point x="13.5" y="15.5" />
+    </edge>
+    <edge source="com.mchange.v2.c3p0.impl.NewProxyStatement" target="java.sql.Statement">
+      <point x="41.5" y="-15.5" />
+      <point x="867.5" y="304.0" />
+      <point x="848.0833333333333" y="304.0" />
+      <point x="848.0833333333333" y="51.0" />
+      <point x="517.25" y="51.0" />
+      <point x="40.5" y="15.5" />
+    </edge>
+    <edge source="com.mchange.v2.c3p0.impl.NewProxyConnection" target="java.sql.Connection">
+      <point x="43.25" y="-15.5" />
+      <point x="336.8452380952381" y="537.0" />
+      <point x="342.0" y="537.0" />
+      <point x="342.0" y="456.0" />
+      <point x="281.83333333333337" y="456.0" />
+      <point x="38.33333333333337" y="15.5" />
+    </edge>
+    <edge source="com.mchange.v2.c3p0.impl.NewProxyCallableStatement" target="java.sql.CallableStatement">
+      <point x="-53.0" y="-15.5" />
+      <point x="38.5" y="15.5" />
+    </edge>
+    <edge source="com.mysql.jdbc.CallableStatement" target="com.mysql.jdbc.PreparedStatement">
+      <point x="-38.5" y="-15.5" />
+      <point x="0.0" y="15.5" />
+    </edge>
+    <edge source="com.mysql.jdbc.Statement" target="java.sql.Statement">
+      <point x="0.0" y="-15.5" />
+      <point x="67.0" y="51.0" />
+      <point x="436.25" y="51.0" />
+      <point x="-40.5" y="15.5" />
+    </edge>
+    <edge source="com.mchange.v2.c3p0.impl.NewProxyStatement" target="com.mchange.v2.c3p0.C3P0ProxyStatement">
+      <point x="-41.5" y="-15.5" />
+      <point x="784.5" y="304.0" />
+      <point x="716.8333333333334" y="304.0" />
+      <point x="56.33333333333337" y="15.5" />
+    </edge>
+    <edge source="com.mchange.v2.c3p0.impl.NewProxyCallableStatement" target="com.mchange.v2.c3p0.C3P0ProxyStatement">
+      <point x="53.0" y="-15.5" />
+      <point x="430.0" y="304.0" />
+      <point x="604.1666666666666" y="304.0" />
+      <point x="-56.33333333333337" y="15.5" />
+    </edge>
+    <edge source="com.mchange.v2.c3p0.impl.NewProxyPreparedStatement" target="java.sql.PreparedStatement">
+      <point x="-55.0" y="-15.5" />
+      <point x="558.0" y="294.0" />
+      <point x="565.5" y="294.0" />
+      <point x="565.5" y="218.0" />
+      <point x="353.79166666666663" y="218.0" />
+      <point x="54.0" y="15.5" />
+    </edge>
+    <edge source="com.mchange.v2.c3p0.C3P0ProxyConnection" target="java.sql.Connection">
+      <point x="0.0" y="-15.5" />
+      <point x="0.0" y="15.5" />
+    </edge>
+    <edge source="com.mysql.jdbc.PreparedStatement" target="java.sql.PreparedStatement">
+      <point x="40.5" y="-15.5" />
+      <point x="148.0" y="218.0" />
+      <point x="245.79166666666663" y="218.0" />
+      <point x="-54.0" y="15.5" />
+    </edge>
+    <edge source="com.mysql.jdbc.StatementImpl" target="com.mysql.jdbc.Statement">
+      <point x="0.0" y="-15.5" />
+      <point x="0.0" y="15.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.7665706051873199" x="455.12218045112786" y="297.0" />
+  <SelectedNodes />
+  <Categories />
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+
