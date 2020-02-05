@@ -6,16 +6,17 @@
 ### multi ###
 - multi：multi开启事务（**非原子性**），包含多个命令。
 - exec触发。
-- 可以理解为打包的批量执行脚本，某条命令执行失败不会导致之前的命令回滚，后续命令也会继续执行。
+- 可以理解为打包的**批量执行脚本**，某条命令执行失败不会导致之前的命令回滚，后续命令也会继续执行。
 
 ### watch ###
 - watch：监视key，如事务开始前key被改动，终止事务。
-- client1完成操作后会将watch这个key的列表中其他client状态设置为CLIENT_DIRTY_CAS
-- client2执行时状态为CLIENT_DIRTY_CAS直接终止事务。
-- [原理](https://www.jianshu.com/p/ad273642b3bb)。
-
+- [原理](https://www.jianshu.com/p/ad273642b3bb)：
+  - 服务端维护key->watch这个key的client列表。
+  - client1完成操作后会将watch这个key的列表中其他client状态设置为CLIENT_DIRTY_CAS，并把自己从列表中删除。
+  - client2执行时状态为CLIENT_DIRTY_CAS直接终止事务返回失败。
 
 ## Jedis实现 ##
+- 先开watch，再开multi。
 - 根据 ```transaction.exec()``` 执行结果是否都是OK，判断操作是否成功。
   - 失败则重试或者抛异常。
   - 成功则继续操作。

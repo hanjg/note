@@ -1,17 +1,30 @@
 [toc]
 ## 简介 ##
+### 特点 ###
+- 优点：
+  - 大容量存储。支持P级别数据。
+  - 高ops。单节点1w+，集群可达百万+。
+  - 列扩展方便。
+    - client直接新增列即可，列为空不占存储空间。
+    - mysql需要执行ddl，并占默认空间。
+  - 扩容方便。新增节点后执行rebalance即可。
+- 缺点：
+  - 不支持复杂查询。kv型，需要rowkey查询。
+  - 单点恢复时间较长。分钟级，保证CP。
+  - 长尾。受gc影响，999线是avg 20 倍左右。
+  - 部署较复杂。
+- 对比关系型数据库：
+  - 关系型数据库：行的各个列都是不可分割的，存储在一起。
+  - Hbase：行是抽象的概念，每一列是离散的，不同列可在不同机器上。
+
 ### 使用场景 ###
 - 数据量超过千万。
 - 数据分析需求弱，复杂查询少。
 - 实时性要求不高。
 
-### 对比关系型数据库 ###
-- 关系型数据库：行的各个列都是不可分割的，存储在一起。
-- Hbase：行是抽象的概念，每一列是离散的，不同列可在不同机器上。
-
 ### CP ###
-- 强一致：对于每一个region同时只有一个region server提供服务。
-- 牺牲可用性：region server宕机，迁到其他region server，新region需要根据WAL来redo，这期间region不可用的，从而提高一致性。
+- 运行时强一致：对于每一个region同时只有一个region server提供服务。
+- 故障时牺牲可用性：region server宕机，迁到其他region server，新region需要根据WAL来redo，这期间region不可用的，从而提高一致性。
 
 ## 存储架构 ##
 - ![191009.row.png](https://img-blog.csdnimg.cn/20191009121551676.png)
@@ -23,8 +36,10 @@
 - **单元格**：一个列的一个**版本**的值，版本号默认为写入的时间戳。
 
 ## 部署架构 ##
-### 集群 ###
-- ![191016.regionserver.png](https://img-blog.csdnimg.cn/20191017000056400.png)
+### 典型部署 ###
+- 5节点zk集群+1主2备master+n个regionserver（每个2T容量）。<br>![191016.regionserver.png](https://img-blog.csdnimg.cn/20191017000056400.png)
+
+### 概念 ###
 - **region server** 是**region** 的容器。
 - **region** ，一段数据的集合,或者说多个行的集合：
   - 不能跨服务器，一个region server上有多个region。
@@ -41,9 +56,9 @@
   - 环状滚动日志：写入效果最高、空间不会变大。
   - 滚动条件：1、WAL所在的block快满；2、WAL空间大于block的阈值。
   - WAL创建在```/hbase/.log```下，归档到```/hbase/.oldlogs```下。
-  - 删除条件：当WAL不需要作为用来恢复数据的备份，即没有任何引用指向这个WAL文件。
+  - 删除条件：当WAL不需要作为用来恢复数据的备份，即没有任何引用指向这个WAL文件。引用分类：
     - TTL进程引用：超时时间（默认10min）。
-    - 如开启replication，该进程在所有集群备份前引用。
+    - 进群备份引用：如开启replication，该进程在所有集群备份前引用。
 
 ### store ###
 - ![191018.store.png](https://img-blog.csdnimg.cn/20191018195616576.png)
@@ -75,13 +90,13 @@
 2. Memstore：整理成LSM树。
    1. 刷写（定时任务）之前，memstore容量如果到达阻塞阈值会暂停memstore的写入，可通过调大JVM堆解决。
 3. HFile：memstore达到尺寸上限或者刷写间隔，刷到HDFS
-   1. Minor Compaction：store中的多个HFile合并为一个，达到TTL的数据会被移除。
-   2. Major Compaction：store中的所有HFile合并为一个，过期数据和手动删除的数据会被移除。
+   1. Minor Compaction：store中的多个HFile合并为一个，**达到TTL**的数据会被移除。
+   2. Major Compaction：store中的所有HFile合并为一个，**达到TTL**的和**手动删除**的数据会被移除。
 
 ### 查询架构 ###
 - ![191022.query.png](https://img-blog.csdnimg.cn/20191022003029349.png)
-1. 从zk上查有hbase:meta表的region server。
-2. 连接该region server获取所有region的行键范围，并且缓存该meta信息。
+1. 从zk上查有hbase:meta表的region server （meta节点）。
+2. 连接**meta节点**获取所有region的行键范围，并且缓存该meta信息。
 3. 直连包含目标rowkey的region server操作。
 
 ### 查询顺序 ###
@@ -89,7 +104,7 @@
 2. Memstore
 3. HFile
 
-## API ##
+## 部分API ##
 - checkAndPut：CAS的应用，Hbase保证原子性。
 - append：value后面增加字节组。
 - increment：long类型value+1。

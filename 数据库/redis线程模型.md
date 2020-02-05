@@ -1,5 +1,5 @@
 [toc]
-## 文件事件线程模型 ##
+## 文件事件模型 ##
 - ![191112.redisthread.png](https://img-blog.csdnimg.cn/20191112093321260.png)
 - 事件驱动设计，采用[reactor模式](https://www.cnblogs.com/doit8791/p/7461479.html)——每当一个Event输入到Service Handler之后，该Service Handler会主动的根据不同的Event类型将其分发给对应的Request Handler来处理。
 
@@ -13,11 +13,12 @@
 
 ### I/O多路复用程序 ###
 - 监听多个套接字，并通过**队列**传递产生了事件的套接字给下游事件分派器。
+- [基于 epoll 实现](https://blog.csdn.net/wxy941011/article/details/80274233)。
 
 ### 文件事件分派器 ###
 - 接收队列中的套接字，并根据**事件类型**调用相应的事件处理器。
 - 上一个套接字关联的事件处理器执行完毕，才继续处理下一个套接字。
-- redis**单线程**指的是[事件分派器单线程](https://blog.csdn.net/dreamwbt/article/details/81148588)，建立连接时多线程的。
+- redis**单线程**指的是[事件分派器单线程](https://blog.csdn.net/dreamwbt/article/details/81148588)，建立连接时是多线程的。
 
 ### 事件处理器 ###
 - 是一个个函数，处理对应事件。 	常用的有：
@@ -31,7 +32,7 @@
 
 ## 高效的单线程 ##
 原因：
-- 纯内存操作。
-- 非阻塞I/O多路复用。
-- C语言，效率高。
+- 纯内存操作。mysql之类的还涉及读写磁盘。
+- 非阻塞I/O多路复用。不用被之前客户端的请求阻塞。
 - 单线程没有线程切换开销。
+- C语言，效率高。
