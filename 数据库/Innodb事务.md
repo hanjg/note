@@ -27,4 +27,9 @@
 - 实际执行的是delete不再被所有事务引用的Undo段。
 
 ## 事务的隔离级别 ##
-- [https://blog.csdn.net/qq_40369829/article/details/79361814](https://blog.csdn.net/qq_40369829/article/details/79361814)
+- [事务隔离级别和锁](https://blog.csdn.net/qq_40369829/article/details/79361814)
+- mysql的四种隔离级别。
+  - READ_UNCOMMITTED
+  - READ_COMMITTED
+  - REPEATABLE_READ。使用next-key lock，解决幻读。
+  - SERIALIZABLE
