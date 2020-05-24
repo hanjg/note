@@ -1,8 +1,9 @@
 [toc]
-## 主要流程 ##
+## 本地window ##
+### 主要流程 ###
 - [https://jingyan.baidu.com/article/597035521d5de28fc00740e6.html](https://jingyan.baidu.com/article/597035521d5de28fc00740e6.html)
 
-## 服务启动 ##
+### 服务启动 ###
 - [启动命令](https://www.cnblogs.com/xixihuang/p/5663559.html)。
 ```txt
 mysqld --remove  //删除mysql服务
@@ -50,10 +51,52 @@ default-storage-engine=INNODB
 sql_mode=ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
 ```
 
-## mysql配置 ##
+### mysql配置 ###
 - [sql_mode设置](https://blog.csdn.net/Peacock__/article/details/78923479)。[相关问题](https://blog.csdn.net/ch5057997/article/details/78540837)。
 - 初始密码为空，不为空参考：[默认密码的查找修改](https://www.cnblogs.com/wolf-sun/p/6543092.html)。
 ```
 ALTER USER 'root'@'localhost' IDENTIFIED BY '新密码';
 exit;
 ```
+
+## 远程ubuntu ##
+### 安装mysql服务器 ###
+- 使用管理员用户登录。
+- 安装mysql客户端。
+```sh
+sudo apt-get install mysql-server
+```
+
+- 检查mysql状态，socket处于listen状态。
+```sh
+sudo netstat -tap | grep mysql
+```
+![](https://img-blog.csdn.net/20180628212019641)
+
+### 修改mysql监听端口 ###
+- 修改mysql监听ip为所有ip。在 ```/etc/mysql/my.cnf``` 中将bind-address改为 ```0.0.0.0``` 。
+- 重启mysql。
+```sh
+service mysql restart
+```
+- 查询监听ip。
+```sh
+netstat -ano | grep 3306
+```
+![180628.mysqllistenip.png](https://img-blog.csdn.net/20180628213012125)
+
+### 创建远程登录账号 ###
+- 登录mysql。
+```sh
+mysql -u root -p
+```
+- 创建远程登录账号。
+```sh
+grant all privileges on *.* to '用户'@'ip' identified by '密码' with grant option;
+flush privileges;
+```
+
+### 配置安全组规则 ###
+- 配置安全组规则：云服务器控制台->网络和安全组->安全组配置，开放mysql端口。<br>![180628.group.png](https://img-blog.csdn.net/20180628213605839)
+
+## 远程centos ##
