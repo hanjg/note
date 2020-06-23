@@ -9,6 +9,8 @@
 - [后端项目](https://github.com/hanjg/house)
 
 ## echarts使用 ##
+- [官网](https://echarts.apache.org/zh/index.html)。
+
 ### 依赖 ###
 - 安装
 ```txt

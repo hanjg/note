@@ -100,3 +100,47 @@ flush privileges;
 - 配置安全组规则：云服务器控制台->网络和安全组->安全组配置，开放mysql端口。<br>![180628.group.png](https://img-blog.csdn.net/20180628213605839)
 
 ## 远程centos ##
+- [参考](https://juejin.im/post/5c088b066fb9a049d4419985)。
+
+### 安装mysql ###
+- 添加仓库。
+```sh
+sudo rpm -ivh https://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm
+```
+
+- 确认添加成功。
+```sh
+sudo yum repolist all | grep mysql | grep enabled
+```
+```sh
+mysql-connectors-community/x86_64  MySQL Connectors Community    enabled:     51
+mysql-tools-community/x86_64       MySQL Tools Community         enabled:     63
+mysql57-community/x86_64           MySQL 5.7 Community Server    enabled:    267
+```
+
+- 安装。
+```sh
+sudo yum -y install mysql-community-server
+```
+
+### 启动mysql ###
+```sh
+sudo systemctl start mysqld
+```
+
+### 配置mysql ###
+- 修改端口号。路径：```/etc/my.cnf```
+```	
+[mysqld]
+port = 3307
+```
+
+- 配置密码。默认密码位置，通过命令显示。``` /var/log/mysqld.log ```
+```sh
+cat /var/log/mysqld.log | grep -i 'temporary password'
+```
+
+- 如果用环境变量配置密码，需要执行命令立刻生效。
+```
+source /etc/profile
+```
