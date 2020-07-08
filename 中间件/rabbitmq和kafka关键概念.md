@@ -23,14 +23,17 @@
 - [官方文档](http://rabbitmq.mr-ping.com/AMQP/AMQP_0-9-1_Model_Explained.html)，[入门教程](https://www.jianshu.com/p/dae5bbed39b1)。
 
 ### kafka ###
-- 多订阅者的Topic，每个topic分为多个partition，并行消费。通过offset来标识消费者已经消费的消息。<br>![](http://kafka.apachecn.org/10/images/log_anatomy.png)
+- 每个topic分为多个partition，并行消费。通过offset来标识已经消费的消息。<br>![](http://kafka.apachecn.org/10/images/log_anatomy.png)
+- partion可多副本，在不同broker打散容错。
 - 一个consumer group（逻辑消费者）由多个consumer组成，消费一个topic。<br>![](http://kafka.apachecn.org/10/images/consumer-groups.png)
 - [官方文档](http://kafka.apachecn.org/intro.html)
 
 ## 对比 ##
 - rabbitMQ：erlang语言开发，依靠活跃的开源社区支持。
+  - 一个topic**一个分片**。
   - 数据一致性、稳定性和可靠性高。 
 - rocketMQ：阿里出品。
-- kafka：业界标准.
-  - 可扩展，高性能，多partition可容错。适合大数据领域等，可改造可靠性。
+- kafka：业界标准。
+  - 一个topic**多个分片**。
+  - 多分片机制->高性能，可扩展，可容错。适合大数据领域等，可改造可靠性。
 - [参考](https://segmentfault.com/a/1190000016376216)。
