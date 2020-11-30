@@ -1,17 +1,10 @@
 [toc]
-## 简介 ##
-- 实现上海二手房全量数据动态更新、统计、汇总展示。
-- 效果：
-  - ![200602.echarts.png](https://img-blog.csdnimg.cn/20200603002234511.png)
-  - ![https://img-blog.csdnimg.cn/20200603003733132.png](https://img-blog.csdnimg.cn/20200603003733132.png "200602.form.png")
-- [前端项目](https://github.com/hanjg/house-vue)
-  - [关键流程](https://blog.csdn.net/qq_40369829/article/details/106089327)
-- [后端项目](https://github.com/hanjg/house)
+## 前置 ##
+- [echarts文档](https://echarts.apache.org/zh/index.html)。
+- [vue项目的搭建和部署](https://blog.csdn.net/qq_40369829/article/details/106089327)。
 
-## echarts使用 ##
-- [官网](https://echarts.apache.org/zh/index.html)。
-
-### 依赖 ###
+## echart使用 ##
+### 引入依赖 ###
 - 安装
 ```txt
 cnmp install echarts
@@ -29,7 +22,7 @@ var echarts = require('echarts');
 
 ```
 
-### 框架 ###
+### 展示框架 ###
 - template中搭建框架。路径：``` views/dashboard/index.vue```
 ```html
     <el-row>
@@ -245,3 +238,7 @@ var optionTemplate = {
 
 
 ```
+
+### 展示效果 ###
+- ![200602.echarts.png](https://img-blog.csdnimg.cn/20200603002234511.png)
+- ![https://img-blog.csdnimg.cn/20200603003733132.png](https://img-blog.csdnimg.cn/20200603003733132.png "200602.form.png")
