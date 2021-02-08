@@ -9,7 +9,7 @@
   6. 其他特性。Redis还支持 publish/subscribe, 通知, key 过期等等特性。
 - 缺点：
   1. 受限于**物理内存**。通常用于小数据量的高性能操作。
-  2. 持久化可能丢失数据。尽量做缓存而不是存储。
+  2. [持久化可能丢失数据](https://blog.csdn.net/qq_40369829/article/details/107829437)。尽量做缓存而不是存储。
 - [官网](http://www.redis.net.cn/)
 
 ## 数据结构 ##
@@ -30,8 +30,8 @@ struct sdshdr {
 - 对比C字符串。
   - O(1)获取字符串长度。
   - 杜绝缓冲区溢出。C手动分配内存和拼接字符串可能导致。
-  - 减少修改时重新分配内存的次数。空间预分配、惰性释放空间。
-  - 二进制安全。可保存二进制数据，\0在C中会被识别为结束。
+  - 减少修改时重新分配内存的次数。空间预分配、惰性释放。
+  - 二进制安全。\0在C中会被识别为结束。
 
 ### linkedlist ###
 - 双向无环链表。<br>![210204.list.png](https://img-blog.csdnimg.cn/20210208131508937.png)
@@ -60,7 +60,7 @@ typedef struct listNode {
 } listNode
 ```
 
-### hashtable ###
+### dict ###
 - 字典。链表解决hash冲突。两块空间rehash。<br>![210204.dict.png](https://img-blog.csdnimg.cn/20210208131537633.png)
 ```c
 typedef struct dict {
@@ -101,7 +101,7 @@ typedef struct dictEntry {
 - rehash时机：
   - 扩展：负载因子>=1，有BGSAVE则>=5.
   - 收缩：负载因子<=0.1.
-- 渐进式rehash流程：
+- **渐进式rehash**流程：
   - ht[1]分配空间。
   - rehashidx置为1。
   - 对字典增删改查时，附带将ht[0].table[rehashidx]上的所有键值对迁移到ht[1]，rehashidx++。
@@ -156,7 +156,7 @@ typedef struct intset {
 } intset;
 ```
 
-- 集合升级：新元素类型比集合中现有类型长
+- **集合升级**：新元素类型比集合中现有类型长
   - 扩展contents数组空间。
   - 现有元素转换成新元素类型，并移到对应的位置。
   - 新元素加到数组中（最前或者最后）。
@@ -170,7 +170,7 @@ typedef struct intset {
 - ![210205.ziplistkey.png](https://img-blog.csdnimg.cn/20210208131750649.png)
 - entry的结构。<br>![210205.ziplistentry.png](https://img-blog.csdnimg.cn/20210208193112426.png)
   - previous_entry_length：前一个节点长度，字段长度为1或5个字节。逆向遍历使用。
-- 连锁更新。
+- **连锁更新**。
   - 插入和删除节点，导致自身和下游的previous_entry_length长度不够，节点均需要扩展。
   - 连续的扩展概率较低。
 
@@ -194,7 +194,7 @@ typedef struct redisObject {
 - 共享0~9999的字符串对象，节约空间。
 
 ### String ###
-- 数据结构为SDS，分三种编码：
+- 数据结构为3种SDS编码：
   - int。保存可以用long类型表示的整数。<br>![210207.int.png](https://img-blog.csdnimg.cn/20210208132032695.png)
   - embstr。字符串长度<=32字节，分配为连续的内存空间，只需一次分配和回收。<br>![210207.embstr.png](https://img-blog.csdnimg.cn/20210208132032616.png)
   - raw。字符串长度>32字节。<br>![210207.raw.png](https://img-blog.csdnimg.cn/20210208132032617.png)
@@ -211,13 +211,13 @@ typedef struct redisObject {
 ### Hash ###
 - 分为两种编码：
   - ziplist：同一键值对键和值相邻，键在前。<br>![210207.hash.ziplist.png](https://img-blog.csdnimg.cn/20210208191701647.png)
-  - hashtable：键值都为string类型对象。<br>![210207.hash.hashtable.png](https://img-blog.csdnimg.cn/20210208191701694.png)
-- 元素个数小于512且长度都小于64字节时，ziplist，超出转为hashtable。
+  - dict<br>![210207.hash.hashtable.png](https://img-blog.csdnimg.cn/20210208191701694.png)
+- 元素个数小于512且长度都小于64字节时，ziplist，超出转为dict。
 
 ### Set ###
 - 分为两种编码：
   - intset：所有元素都是整数且数量不超过512。<br>![210207.set.intset.png](https://img-blog.csdnimg.cn/20210208191754309.png)
-  - hashtable<br>![210207.set.hashtable.png](https://img-blog.csdnimg.cn/20210208191815208.png)
+  - dict<br>![210207.set.hashtable.png](https://img-blog.csdnimg.cn/20210208191815208.png)
 - intset->hashtable：不满足条件时单向转换。
 
 ### Zset ###
@@ -226,7 +226,7 @@ typedef struct redisObject {
   - skiplist：同时使用跳表和字典，两个**共享**成员和分值。
     - 字典：O(1)随机查分值，O(NlogN)范围查分值。
     - 跳表：O(logN)范围查询，O(logN)随机查询。<br>![210207.zset.skiplist.png](https://img-blog.csdnimg.cn/20210208191850768.png)
-- 元素个数小于128且长度都小于64字节时，ziplist，超出转为skiplist。
+- 元素个数小于128且长度都小于64字节时，ziplist，超出转为skiplist+dict。
 
 
 
