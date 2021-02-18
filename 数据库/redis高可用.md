@@ -30,26 +30,29 @@
 
 ### 正常运行 ###
 - ![200807.run.png](https://img-blog.csdnimg.cn/20200807001533628.png)
-- Sentinel实例之间只需要创建命令连接。
+- Sentinel之间只需要创建命令连接。
+- Sentinel和redis之间创建命令连接、订阅连接。
 
 #### 命令连接 ####
-- 连接主从服务器：发送**INFO命令**，默认10s一次，获取服务器当前信息（主服务还包括有哪些从节点）。
-- 连接其他Sentinel实例：下线检测、故障。
+> 用于sentinel之间通信、操作redis
+- 向主服务器：发送默认10s一次**INFO命令**，获取主服务器当前信息（包括从节点ip）。
+- 向从服务器：发送默认10s一次**INFO命令**，补充从服务器信息，如run_id。
+- 向其他Sentinel实例：下线检测、故障转移命令。
 
 #### 订阅连接 ####
-- 连接主从服务器：
-  - 向服务器**_sentinel_:hello频道**发送自身Sentinel实例和监视的主服务器信息，默认2s一次。
-  - 订阅服务器_sentinel_:hello频道，更新Sentinel和主从服务器拓扑，包括发现未知的Sentiel实例。
+> sentinel之间互相发现、互相交换集群拓扑。
+- 向主和从服务器 **_sentinel_:hello频道** 默认2s一次发送自身Sentinel实例和监视的主服务器信息。
+- 订阅服务器_sentinel_:hello频道，更新Sentinel和主从服务器拓扑，包括发现未知的Sentiel实例。
 
 ### 检查下线 ###
 - ![200807.down.png](https://img-blog.csdnimg.cn/20200807001533622.png)
 
 #### 主观下线 ####
-- Sentinel默认每秒**ping**一次（主从服务器，其他Sentinel），超过阈值无响应。
+- Sentinel默认每秒**ping**一次创建命令连接的实例，超过阈值无响应，则认为主观下线。
 
 #### 客观下线 ####
 - 认为主观下线时，向其他Sentinel发送命令询问节点是否下线。
-- 如果多数Sentinel回复节点下线，则认为客观下线。
+- 如果超过配置数量的Sentinel回复节点下线，则认为客观下线。
 
 ### 故障转移 ###
 - ![200807.migrate.png](https://img-blog.csdnimg.cn/20200807001533687.png)
@@ -57,13 +60,15 @@
 #### Leader选举 ####
 - 在监视这个master的Sentinel中选举Leader节点操作故障转移。[raft算法](https://blog.csdn.net/DONGWEIJHZHANGLI/article/details/92407376)。
 - 步骤：
-  1. 做主观下线的Sentinel节点像其他Sentinel节点发送命令，要求将自己设置为Leader。
+  1. Sentinel节点像其他Sentinel节点发送命令，要求将自己设置为Leader。
   2. 接收到的sentinel同意最先收到的Sentinel节点命令（**先到先得**），选该节点为Leader，发送回复。
   3. 如果做主观下线的Sentinel节点发现自己的票数已经**超过半数**，则成为Leader。
   4. 如果一定时间内未选出Leader，那么将等待一段时重新进行选举。
 
 #### 故障恢复 ####
 - 从服务器中升级一个至主服务器。
-- 其他从服务器复制这个新的主服务器。
-- 下线的主服务降级为从服务器,上线后，复制新的主服务器。
+  - 按照优先级、复制偏移量、运行id排序选取。
+  - 发送```slaveof no one``` 之后，每秒一次INFO 观察操作的redis直至回复为Master。
+- 修改其他从服务器复制目标。
+- 故障下线的主服务器上线后，设置为从服务器。
 - ![200807.new.png](https://img-blog.csdnimg.cn/202008070015336.png)

@@ -1,6 +1,6 @@
 [toc]
 ## redis简介 ##
-- [redis简介和安装配置——淘淘商城（十七）](https://blog.csdn.net/qq_40369829/article/details/79824618)
+- [redis数据结构](https://blog.csdn.net/qq_40369829/article/details/113761356)
 
 ## redis内存空间 ##
 ### 对象内存 ###

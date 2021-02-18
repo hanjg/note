@@ -12,8 +12,11 @@
   - 同一个套接字**优先处理AE_READABLE**事件。
 
 ### I/O多路复用程序 ###
-- 监听多个套接字，并通过**队列**传递产生了事件的套接字给下游事件分派器。
-- [基于 epoll 实现](https://blog.csdn.net/wxy941011/article/details/80274233)。
+- 监听多个套接字，并通过**队列**传递产生了事件的套接字给下游事件分派器。<br>![210218.redis.queue.png](https://img-blog.csdnimg.cn/2021021823403922.png)
+- [基于 epoll 实现](https://blog.csdn.net/wxy941011/article/details/80274233)。epoll优势：
+  - 不限制最大连接数，上限为文件描述符。
+  - 只关注活跃连接，不随socket增长线性下降。
+  - [mmap共享内存](https://blog.csdn.net/luckywang1103/article/details/50619251)。
 
 ### 文件事件分派器 ###
 - 接收队列中的套接字，并根据**事件类型**调用相应的事件处理器。
@@ -30,8 +33,11 @@
 - 分为定期事件和周期事件。
 - 文件事件和时间事件之间是合作关系，服务器**轮流处理**，不会抢占，所以时间事件实际处理事件通常比设定的晚一点。
 
+## 命令执行流程 ##
+- [redis命令执行流程分析](https://blog.csdn.net/houjixin/article/details/27184299)
+- ![210218.redis.event.png](https://img-blog.csdnimg.cn/2021021823403929.png)
+
 ## 高效的单线程 ##
-原因：
 - 纯内存操作。mysql之类的还涉及读写磁盘。
 - 非阻塞I/O多路复用。不用被之前客户端的请求阻塞。
 - 单线程没有线程切换开销。
