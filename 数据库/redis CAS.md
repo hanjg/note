@@ -6,7 +6,10 @@
 ### multi ###
 - multi：multi开启事务（**非原子性**），包含多个命令。
 - exec触发。
-- 可以理解为打包的**批量执行脚本**，某条命令执行失败不会导致之前的命令回滚，后续命令也会继续执行。
+- 可以理解为打包的**批量执行脚本**。某条命令执行失败不会导致之前的命令回滚，后续命令也会继续执行。
+- [对比Pipeline](https://www.cnblogs.com/cjjjj/p/12818735.html)：
+  - multi使用服务端缓冲，每个命令发送一次给服务端，执行过程不会有其他命令穿插。
+  - pipeline使用客户端缓冲，多个命令一次性发给服务端，执行过程可能有其他命令穿插。
 
 ### watch ###
 - watch：监视key，如事务开始前key被改动，终止事务。
@@ -123,7 +126,7 @@ public class RedisConfig {
 ```
 
 ## 备选方案 ##
-- [redis悲观锁](https://blog.csdn.net/qq_40369829/article/details/87560838#redis_33)。
+- [redis悲观锁](https://blog.csdn.net/qq_40369829/article/details/87560838#redis_33)：setnx
 - 原因：
   - 由于watch需要维护key的客户端观察者列表，key修改之后修改客户端状态会有一定的开销，不适合高并发场景。
   - 某些中间件不支持watch+multi
