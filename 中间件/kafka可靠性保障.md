@@ -47,7 +47,7 @@
 - auto.offset.reset。无可提交偏移量（第一次启动）或偏移量不存在时消费者的操作。
   - earliest。从分区开始读数据，大量重复消息，保证最少丢失。
   - latest。从分区末尾开读数据，减少重复，错过更多消息。
-- enable.auto.commit。是否自动提交。
+- enable.auto.commit。是否自动提交，即poll时提交上一次poll的消息，默认5s也提交一次。
   - 自动提交前宕机，处理较多**重复消息**。
   - 对于后台线程处理的消息，可能**提交未完成消息**。
 - auto.commit.interval.ms。自动提交间隔，每隔n ms提交poll到的最大位移。

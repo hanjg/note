@@ -22,6 +22,7 @@
 - 文档。docoment。
   - 索引和搜索的原子单位。包含多个域。
 - 域。field。
+  - text会分词，如不需要分词可使用keyword。
 - 最小搜索单元。term。
 - 倒排索引。
   - 列举所有文档中出现的terms以及它们出现的文档ID和出现频率。
@@ -33,17 +34,26 @@
 ### 请求链路 ###
 - 协调节点转发至主分片数据节点。
 - 主分片写入。
-- 并行复制到副本分片数据节点。
+- 主分片写入成功后，并发写入所有副本分片，所有副本写入完成后返回客户端。
 
 ### 创建文档 ###
-- 文档写入**内存buffer+内存translog文件**。<br>![](https://www.elastic.co/guide/en/elasticsearch/guide/current/images/elas_1106.png)
-- 默认1s一次**refresh内存buffer**，写入文件系统缓存，构成新的segment，**此时文档可以搜索到**。<br>![](https://www.elastic.co/guide/en/elasticsearch/guide/current/images/elas_1107.png)
-- 默认5s一次，**刷translog文件**到磁盘。写到磁盘之前可能写入丢失。
-  - 为了不丢数据，可配置为每次写translog之后刷到磁盘，但是会降低吞吐。
+#### write ####
+- document写入**In-memory buffer**和**内存translog**。<br>![](https://www.elastic.co/guide/en/elasticsearch/guide/current/images/elas_1106.png)
+
+#### refresh ####
+- 默认1s一次refresh**In-memory buffer**，写入文件系统缓存，构成新的segment。
+- 此时文档可以**搜索到**。<br>![](https://www.elastic.co/guide/en/elasticsearch/guide/current/images/elas_1107.png)
+
+#### fsync ####
+- 默认5s一次，刷**translog**到磁盘。translog写到磁盘之前可能丢失数据。
+  - 为了不丢数据，可配置为每次写内存translog后fsync到磁盘，但是会降低吞吐。
 - 默认30min一次，**fsync文件系统缓存**的segment到磁盘，清除translog。<br>![](https://www.elastic.co/guide/en/elasticsearch/guide/current/images/elas_1109.png)
 
-#### segment文件 ####
-- 每1s一个segment文件，数量较多。
+#### merge ####
+- 每1s生成一个segment文件，数量较多，问题如下：
+  - 跟多的元数据管理segement。
+  - 删除操作导致大量无效数据。
+  - 查询遍历每个segment，性能低下。
 - 单独的归并线程merge segment，默认最大segement 5G。
 
 ### 删除文档 ###
