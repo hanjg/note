@@ -38,16 +38,16 @@
 
 ### 创建文档 ###
 #### write ####
-- document写入**In-memory buffer**和**内存translog**。<br>![](https://www.elastic.co/guide/en/elasticsearch/guide/current/images/elas_1106.png)
+- document写入**In-memory buffer**和**内存translog**。<br>![210224.es.write.png](https://img-blog.csdnimg.cn/202102241309124.png)
 
 #### refresh ####
-- 默认1s一次refresh**In-memory buffer**，写入文件系统缓存，构成新的segment。
-- 此时文档可以**搜索到**。<br>![](https://www.elastic.co/guide/en/elasticsearch/guide/current/images/elas_1107.png)
+- 默认1s一次refresh **In-memory buffer**，写入**文件系统缓存**，构成新的segment。
+- 此时文档可以**搜索到**。<br>![210224.es.refresh.png](https://img-blog.csdnimg.cn/2021022413100859.png)
 
 #### fsync ####
 - 默认5s一次，刷**translog**到磁盘。translog写到磁盘之前可能丢失数据。
   - 为了不丢数据，可配置为每次写内存translog后fsync到磁盘，但是会降低吞吐。
-- 默认30min一次，**fsync文件系统缓存**的segment到磁盘，清除translog。<br>![](https://www.elastic.co/guide/en/elasticsearch/guide/current/images/elas_1109.png)
+- 默认30min一次或traslog文件过大时，fsync 文件系统缓存的 **segment** 到磁盘，清除translog。<br>![210224.es.fsync.png](https://img-blog.csdnimg.cn/20210224131218400.png)
 
 #### merge ####
 - 每1s生成一个segment文件，数量较多，问题如下：
