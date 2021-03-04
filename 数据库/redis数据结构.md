@@ -11,6 +11,7 @@
   1. 受限于**物理内存**。通常用于小数据量的高性能操作。
   2. [持久化可能丢失数据](https://blog.csdn.net/qq_40369829/article/details/107829437)。尽量做缓存而不是存储。
 - [官网](http://www.redis.net.cn/)
+- [redis进化史](https://www.javazhiyin.com/36111.html)。
 
 ## 数据结构 ##
 ### SDS ###
