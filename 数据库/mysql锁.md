@@ -120,3 +120,11 @@ insert into t values(0,0,0),(5,5,5),
   - T1：sessionA，c=5上加行锁（优化1唯一索引退化）
   - T2：sessionB和C，先加（0,5）读锁，再c=5加行锁时阻塞。
   - T3：A回滚后，B和C互相等待加写锁。
+
+### 例3 ###
+- 并发的``` insert … on duplicate key ```。
+- 加锁步骤：
+  - insert，唯一键冲突，获取记录的S锁，读记录返回server层。
+  - server层修改。
+  - 写入引擎层，加X锁。
+- 并发时，同一条记录两个session都加上S锁，并互相等待X锁。[导致死锁](https://blog.csdn.net/pml18710973036/article/details/78452688)。
