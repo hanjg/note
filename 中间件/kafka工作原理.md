@@ -45,3 +45,21 @@
   - 干净部分：清理过，每个键只有一个值。
   - 污浊部分：清理之后写入。
 - 清理：相同key保留最新的值。
+
+## 快的原因 ##
+- 传统I/O。
+  - 2次用户上下文切换。
+  - 2次CPU复制、2次DMA复制。<br>![210323.kafka.read.write.png](https://img-blog.csdnimg.cn/20210323002526898.png)
+
+### 写入 ###
+- [顺序写磁盘](https://mp.weixin.qq.com/s/5Mcs1zmoyB6b03c1NGotZA)。
+- [mmap](https://mp.weixin.qq.com/s/-W3oh_fFugZLMF8P5RFSjQ)（Memory Mapped Files）。
+  - 操作系统缓存映射文件到物理内存。
+  - 多1次写缓冲和socket缓冲cpu复制。
+  - 少2次内核空间和用户空间的cpu复制。<br>![210323.kafka.mmap.png](https://img-blog.csdnimg.cn/20210323002526921.png)
+
+### 读取 ###
+- sendfile。
+  - 相比mmap少两次上下文切换。
+  - 对用户空间不可见。比如静态文件服务器。<br>![210323.kafka.sendfile.png](https://img-blog.csdnimg.cn/20210323002526844.png)
+- 批量压缩消息。
