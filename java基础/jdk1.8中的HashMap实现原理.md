@@ -1,5 +1,5 @@
 [toc]
-## 简介 ##
+## Hashmap ##
 - HashMap可以根据键值存取数据。
 - HashMap位于 **java.util** 包下，继承AbsractMap，实现Map，Cloneable，Serializable接口。
 ```java
@@ -8,9 +8,9 @@ public class HashMap<K,V> extends AbstractMap<K,V>
 ```
 
 ## 内部结构 ##
-- **链表**的数组，jdk1.8中当链表长度大于8时，链表会转化为**红黑树**。<br>![](https://tech.meituan.com/img/java-hashmap/hashMap%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84%E5%9B%BE.png)
+- Node数组，**链表**解决hash冲突。jdk1.8中当链表长度大于8时，会转化为**红黑树**。
 - 结点
-    - 链表：包含键、值、hash值、下一个结点引用。
+    - 链表节点：包含键、值、hash值、下一个结点引用。
     - 树结点：继承LinkedHashMap.Entry和HashMap.Node，包含红黑树相关结点。
 ```java
     transient Node<K,V>[] table;
@@ -32,8 +32,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
 
 ## 常用方法 ##
 ### put ###
-- 流程图。<br>![](https://tech.meituan.com/img/java-hashmap/hashMap%20put%E6%96%B9%E6%B3%95%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%9B%BE.png)
-- 源代码。
+- 有key则覆盖，无key则新增。
 ```java
     public V put(K key, V value) {
 		//计算key对应的hash
@@ -197,6 +196,8 @@ public class HashMap<K,V> extends AbstractMap<K,V>
 
 ### resize ###
 - 使用新的大容量数组替代已有的小数组。结点在新的数组中的索引由hash值新增的bit是0还是1决定。
+  - node改为尾插法，解决[1.7之前头插法rehash死循环问题](https://blog.csdn.net/chenyiminnanjing/article/details/82706942)。
+    - hashmap非线程安全，更新覆盖问题仍然存在。
 ```java
     final Node<K,V>[] resize() {
         Node<K,V>[] oldTab = table;
@@ -286,10 +287,6 @@ public class HashMap<K,V> extends AbstractMap<K,V>
 ```
 
 ## 相似数据结构 ##
-### 继承关系 ###
-- ![](https://tech.meituan.com/img/java-hashmap/java.util.map%E7%B1%BB%E5%9B%BE.png)
-
-### 介绍 ###
 1. HashMap：它根据键的hashCode值存储数据，大多数情况下可以直接定位到它的值，因而具有很快的访问速度，但遍历顺序却是不确定的。 HashMap最多**只允许一条记录的键为null**，允许多条记录的值为null。HashMap**非线程安全**，即任一时刻可以有多个线程同时写HashMap，可能会导致数据的不一致。如果需要满足线程安全，可以用 Collections的synchronizedMap方法使HashMap具有线程安全的能力，或者使用ConcurrentHashMap。
 2. Hashtable：Hashtable是遗留类，很多映射的常用功能与HashMap类似，不同的是它承自Dictionary类，并且是**线程安全**的，任一时间只有一个线程能写Hashtable，并发性不如ConcurrentHashMap，因为ConcurrentHashMap引入了分段锁。Hashtable不**建议在新代码中使用**，不需要线程安全的场合可以用HashMap替换，需要线程安全的场合可以用ConcurrentHashMap替换。
 3. LinkedHashMap：LinkedHashMap是HashMap的一个子类，**保存了记录的插入顺序**，在用Iterator遍历LinkedHashMap时，先得到的记录肯定是先插入的，也可以在构造时带参数，按照访问次序排序。
