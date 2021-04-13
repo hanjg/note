@@ -88,3 +88,12 @@
 ### 内部检测 ###
 - performance_schema库file_summary_by_event_name表，统计语句执行时间。
 - [其他检查方法](https://time.geekbang.org/column/article/78134)。
+
+## 相关 ##
+- [mysql（一）——架构和执行流程](https://blog.csdn.net/qq_40369829/article/details/100154362)
+- [mysql（二）——索引](https://blog.csdn.net/qq_40369829/article/details/100154514)
+- [mysql（三）——日志](https://blog.csdn.net/qq_40369829/article/details/100154560)
+- [mysql（四）——快照读](https://blog.csdn.net/qq_40369829/article/details/91359489)
+- [mysql（五）——锁](https://blog.csdn.net/qq_40369829/article/details/100154535)
+- [mysql（六）——高可用](https://blog.csdn.net/qq_40369829/article/details/110413780)
+- [mysql（七）——部分语句实现](https://blog.csdn.net/qq_40369829/article/details/110413795)

@@ -53,6 +53,7 @@
 ### Next-Key Lock ###
 - 锁**范围**，**包括记录本身**。先加gap lock，再加record lock。
 - RR级别使用，可解决[幻读](https://blog.csdn.net/qq_40369829/article/details/79361814)问题。
+> mysql RR下，普通的查询是快照读，不会看到别的事务插入的数据。因此，幻读在**当前读**(select for update)下才会出现。 
 
 ### Next-Key Lock加锁规则 ###
 - [加锁规则](https://time.geekbang.org/column/article/75659)可以概括为：两个原则、两个优化和一个bug:
@@ -128,3 +129,12 @@ insert into t values(0,0,0),(5,5,5),
   - server层修改。
   - 写入引擎层，加X锁。
 - 并发时，同一条记录两个session都加上S锁，并互相等待X锁。[导致死锁](https://blog.csdn.net/pml18710973036/article/details/78452688)。
+
+## 相关 ##
+- [mysql（一）——架构和执行流程](https://blog.csdn.net/qq_40369829/article/details/100154362)
+- [mysql（二）——索引](https://blog.csdn.net/qq_40369829/article/details/100154514)
+- [mysql（三）——日志](https://blog.csdn.net/qq_40369829/article/details/100154560)
+- [mysql（四）——快照读](https://blog.csdn.net/qq_40369829/article/details/91359489)
+- [mysql（五）——锁](https://blog.csdn.net/qq_40369829/article/details/100154535)
+- [mysql（六）——高可用](https://blog.csdn.net/qq_40369829/article/details/110413780)
+- [mysql（七）——部分语句实现](https://blog.csdn.net/qq_40369829/article/details/110413795)

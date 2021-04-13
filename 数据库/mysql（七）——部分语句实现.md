@@ -1,8 +1,9 @@
 [toc]
 ## delete ##
-- innodb_file_per_table = ON，表数据存在文件中，而不是共享表空间。
-- drop table可以直接删除文件。
-- delete 把记录的位置标记为可复用，磁盘上文件不会变小，造成空洞。
+- innodb_file_per_table = ON：表数据存在文件中，而不是共享表空间。
+- drop：清空数据，**删除表结构**。
+- [truncate](https://segmentfault.com/a/1190000023270312)：删除并**重新创建表**，自增列重置。
+- delete：逐条删除数据，把记录的位置标记为可复用，磁盘上文件不会变小，造成空洞。
   - 随机insert也可能造成页分裂，从而造成空洞。
 - [删库恢复数据的办法](https://time.geekbang.org/column/article/78658)。
 
@@ -136,3 +137,12 @@ select city,name,age from t where city='杭州' order by name limit 1000  ;
 - group by尽量使用索引，由于数据有序可边读边输出结果，避免临时表和排序。
 - group by尽量使用内存临时表，tmp_table_size调整内存临时表上限。
 - 如果数据量太大，直接[SQL_BIG_RESULT](https://time.geekbang.org/column/article/80477)使用磁盘临时表。
+
+## 相关 ##
+- [mysql（一）——架构和执行流程](https://blog.csdn.net/qq_40369829/article/details/100154362)
+- [mysql（二）——索引](https://blog.csdn.net/qq_40369829/article/details/100154514)
+- [mysql（三）——日志](https://blog.csdn.net/qq_40369829/article/details/100154560)
+- [mysql（四）——快照读](https://blog.csdn.net/qq_40369829/article/details/91359489)
+- [mysql（五）——锁](https://blog.csdn.net/qq_40369829/article/details/100154535)
+- [mysql（六）——高可用](https://blog.csdn.net/qq_40369829/article/details/110413780)
+- [mysql（七）——部分语句实现](https://blog.csdn.net/qq_40369829/article/details/110413795)

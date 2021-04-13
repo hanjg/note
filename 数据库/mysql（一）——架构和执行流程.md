@@ -67,8 +67,9 @@
 - 存一些缓冲控制对象，空间不够会从缓冲池中申请。
 
 ## sql执行流程 ##
+- [流程](https://time.geekbang.org/column/article/68319)：<br>![201104.mysql.logic.arch.png](https://static001.geekbang.org/resource/image/0d/d9/0d2070e8f84c4801adbfa03bda1f98d9.png)
+
 ### 查询 ###
-- [查询流程](https://time.geekbang.org/column/article/68319)：<br>![201104.mysql.logic.arch.png](https://static001.geekbang.org/resource/image/0d/d9/0d2070e8f84c4801adbfa03bda1f98d9.png)
 - [查一行记录也很慢的可能原因](https://time.geekbang.org/column/article/74687)：
   - [等锁](https://blog.csdn.net/qq_40369829/article/details/100154535)。  
 	- 等MDL锁：如另一个session持有mdl写锁。
@@ -78,7 +79,7 @@
   - [历史版本过多](https://blog.csdn.net/qq_40369829/article/details/91359489)：快照读需要一个个遍历到可见的版本。<br>![201112.version.png](https://static001.geekbang.org/resource/image/46/8c/46bb9f5e27854678bfcaeaf0c3b8a98c.png)
 
 ### 修改 ###
-- 流程同查询，但**WAL**，写内存和日志。
+- 写redolog、binlog、undolog，修改缓冲池数据页，刷脏页。
 - [log一致性](https://blog.csdn.net/qq_40369829/article/details/100154560)。
 
 #### WAL ####
@@ -100,6 +101,7 @@
   - innodb_io_capacity：磁盘全力刷脏页的能力，推荐为磁盘的IOPS。
   - 脏页比例：Innodb_buffer_pool_pages_dirty/Innodb_buffer_pool_pages_total，推荐在75%以下。
   - [刷脏页速度策略](https://time.geekbang.org/column/article/71806)：脏页比例增加、redo和checkpoint差距增加->刷脏页速度增加。
+- 刷脏页时double write避免损坏数据页。
 
 ## Innodb特性 ##
 ### change buffer ###
@@ -211,3 +213,12 @@
 ### 线程id ###
 - 4个字节的数组，全局唯一分配。
 - 循环使用
+
+## 相关 ##
+- [mysql（一）——架构和执行流程](https://blog.csdn.net/qq_40369829/article/details/100154362)
+- [mysql（二）——索引](https://blog.csdn.net/qq_40369829/article/details/100154514)
+- [mysql（三）——日志](https://blog.csdn.net/qq_40369829/article/details/100154560)
+- [mysql（四）——快照读](https://blog.csdn.net/qq_40369829/article/details/91359489)
+- [mysql（五）——锁](https://blog.csdn.net/qq_40369829/article/details/100154535)
+- [mysql（六）——高可用](https://blog.csdn.net/qq_40369829/article/details/110413780)
+- [mysql（七）——部分语句实现](https://blog.csdn.net/qq_40369829/article/details/110413795)

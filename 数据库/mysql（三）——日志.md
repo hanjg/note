@@ -70,3 +70,12 @@
 - undo格式：
   - insert undo log：插入操作的undo，对事务本身可见，提交后可删除。
   - update undo log：更新和删除的undo，需要提供mvcc，提交后放入Undo链表，purge后删除。
+
+## 相关 ##
+- [mysql（一）——架构和执行流程](https://blog.csdn.net/qq_40369829/article/details/100154362)
+- [mysql（二）——索引](https://blog.csdn.net/qq_40369829/article/details/100154514)
+- [mysql（三）——日志](https://blog.csdn.net/qq_40369829/article/details/100154560)
+- [mysql（四）——快照读](https://blog.csdn.net/qq_40369829/article/details/91359489)
+- [mysql（五）——锁](https://blog.csdn.net/qq_40369829/article/details/100154535)
+- [mysql（六）——高可用](https://blog.csdn.net/qq_40369829/article/details/110413780)
+- [mysql（七）——部分语句实现](https://blog.csdn.net/qq_40369829/article/details/110413795)

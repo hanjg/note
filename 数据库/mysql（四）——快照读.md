@@ -32,7 +32,20 @@
   - [低水位，高水位)：数据版本的事务id在视图数组中，未提交，不可见；否则可见。
   - [高水位，+∞)：将来启动的事务，不可见。
 
+### 隔离级别和视图 ###
+- RC。每一条语句执行前重新计算一致性视图。
+- RR。事务开始时创建一致性视图。
+
 ## 参考 ##
 - [MVCC原理](https://mp.weixin.qq.com/s?__biz=MjM5NzAzMTY4NQ==&mid=2653930052&idx=1&sn=eb4cf71dc838e784af27dff2a1ca8d4b&chksm=bd3b582e8a4cd138536baa9a9b8a831f3f34c7790eed4c6f26ffecf0c332636ad896ed9f8da3&scene=21)
 - [sql加锁步骤](https://www.cnblogs.com/yelbosh/p/5813865.html)
 - [事务隔离：为什么你改了我还看不见？](https://time.geekbang.org/column/article/68963)
+
+## 相关 ##
+- [mysql（一）——架构和执行流程](https://blog.csdn.net/qq_40369829/article/details/100154362)
+- [mysql（二）——索引](https://blog.csdn.net/qq_40369829/article/details/100154514)
+- [mysql（三）——日志](https://blog.csdn.net/qq_40369829/article/details/100154560)
+- [mysql（四）——快照读](https://blog.csdn.net/qq_40369829/article/details/91359489)
+- [mysql（五）——锁](https://blog.csdn.net/qq_40369829/article/details/100154535)
+- [mysql（六）——高可用](https://blog.csdn.net/qq_40369829/article/details/110413780)
+- [mysql（七）——部分语句实现](https://blog.csdn.net/qq_40369829/article/details/110413795)
