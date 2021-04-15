@@ -16,7 +16,18 @@
 - [基于 epoll 实现](https://blog.csdn.net/wxy941011/article/details/80274233)。epoll优势：
   - 不限制最大连接数，上限为文件描述符。
   - 只关注活跃连接，不随socket增长线性下降。
-  - [mmap共享内存](https://blog.csdn.net/luckywang1103/article/details/50619251)。
+  - [mmap共享内存](https://blog.csdn.net/luckywang1103/article/details/50619251)，避免fd列表在内核和用户之间copy。
+
+#### 3种流程 ####
+- select：
+  - 用户态copy fd数组至内核态。
+  - 内核遍历fd，查看是否有IO事件。此时select阻塞。
+  - 返回给用户态可读fd个数，用户态遍历具体可读fd。
+- poll:同select，仅取消select 1024个fd的限制。
+- [epoll](https://mp.weixin.qq.com/s/JHqVY02mMJIpuZ4s9XOrVg)：
+  - 内核中保存fd数组，每次变更时epoll_ctl通知内核。
+  - 内核不轮询，通过异步IO事件唤醒用户线程。
+  - 内核将有IO事件的fd返回给用户态。<br>![210415.epoll.png](https://img-blog.csdnimg.cn/20210416002648243.png)
 
 ### 文件事件分派器 ###
 - 接收队列中的套接字，并根据**事件类型**调用相应的事件处理器。

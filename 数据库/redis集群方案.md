@@ -20,11 +20,7 @@
 - 槽迁移结束，如果请求源节点发现对应的槽已迁移，返回MOVED错误，客户端**之后**这个槽的请求都转向目标节点。
 
 ### 容错机制 ###
-- 当半数以上的master节点与该master节点通信超时，认为当前的master节点挂掉，使用slave节点替换。
-- ![7.redisfail.png](https://img-blog.csdn.net/20180404222440876)
-- 集群不可用的情况：
-    - 任意master挂掉且该master没有slave节点。即整个集群的hash映射不完整。
-    - 半数以上的master挂掉。无论是否有slave节点替换。
+- [集群模式](https://blog.csdn.net/qq_40369829/article/details/107948395)。
 
 ## codis ##
 ### 架构 ###
