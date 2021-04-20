@@ -47,19 +47,24 @@
 - 清理：相同key保留最新的值。
 
 ## 快的原因 ##
-- 传统I/O。
-  - 2次用户上下文切换。
-  - 2次CPU复制、2次DMA复制。<br>![210323.kafka.read.write.png](https://img-blog.csdnimg.cn/20210323002526898.png)
+- 写入broker
+  - [顺序写磁盘](https://mp.weixin.qq.com/s/5Mcs1zmoyB6b03c1NGotZA)。
+  - [mmap](https://mp.weixin.qq.com/s/-W3oh_fFugZLMF8P5RFSjQ)（Memory Mapped Files）。
+- 读取broker
+  - sendfile
+  - [批量压缩消息](https://mp.weixin.qq.com/s/5Mcs1zmoyB6b03c1NGotZA)，节省网络资源。
 
-### 写入 ###
-- [顺序写磁盘](https://mp.weixin.qq.com/s/5Mcs1zmoyB6b03c1NGotZA)。
-- [mmap](https://mp.weixin.qq.com/s/-W3oh_fFugZLMF8P5RFSjQ)（Memory Mapped Files）。
-  - 操作系统缓存映射文件到物理内存。
-  - 多1次写缓冲和socket缓冲cpu复制。
-  - 少2次内核空间和用户空间的cpu复制。<br>![210323.kafka.mmap.png](https://img-blog.csdnimg.cn/20210323002526921.png)
+### read+write ###
+- 4次上下文切换、2次CPU复制、2次DMA复制。<br>![210323.kafka.read.write.png](https://img-blog.csdnimg.cn/20210323002526898.png)
 
-### 读取 ###
-- sendfile。
-  - 相比mmap少两次上下文切换。
-  - 对用户空间不可见。比如静态文件服务器。<br>![210323.kafka.sendfile.png](https://img-blog.csdnimg.cn/20210323002526844.png)
-- 批量压缩消息。
+### mmap ###
+- 用户缓冲区映射到内核缓冲区，避免复制到用户空间。（[page cache](https://blog.csdn.net/qq_34827674/article/details/108756999))。
+- 4次上下文切换、内核空间内1次cpu复制、2次DMA复制。<br>![210323.kafka.mmap.png](https://img-blog.csdnimg.cn/20210323002526921.png)
+
+### sendfile ###
+- 内核缓冲和socket缓冲复制，减少上限文切换。<br>![210323.kafka.sendfile.png](https://img-blog.csdnimg.cn/20210323002526844.png)
+- 2次上下文切换、内核空间内1次cpu复制、2次DMA复制。
+
+### sendfile+DMA Scatter/Gather ###
+- 文件描述符复制到socket缓冲，DMA 从内核缓冲区复制网卡。需要硬件支持。<br>![210323.kafka.sendfile.gather.png](https://img-blog.csdnimg.cn/20210421004128315.png)
+- 2次上下文切换、2次DMA复制。

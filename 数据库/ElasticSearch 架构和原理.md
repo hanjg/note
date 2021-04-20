@@ -34,7 +34,7 @@
 ### 请求链路 ###
 - 协调节点转发至主分片数据节点。
 - 主分片写入。
-- 主分片写入成功后，并发写入所有副本分片，所有副本写入完成后返回客户端。
+- 主分片写入成功后，并发写入所有副本分片，默认过半副本写入完成后返回客户端。
 
 ### 创建文档 ###
 #### write ####
@@ -47,7 +47,7 @@
 #### fsync ####
 - 默认5s一次，刷**translog**到磁盘。translog写到磁盘之前可能丢失数据。
   - 为了不丢数据，可配置为每次写内存translog后fsync到磁盘，但是会降低吞吐。
-- 默认30min一次或traslog文件过大时，fsync 文件系统缓存的 **segment** 到磁盘，清除translog。<br>![210224.es.fsync.png](https://img-blog.csdnimg.cn/20210224131218400.png)
+- 默认30min一次或traslog文件过大默认512M时，fsync 文件系统缓存的 **segment** 到磁盘，清除translog。<br>![210224.es.fsync.png](https://img-blog.csdnimg.cn/20210224131218400.png)
 
 #### merge ####
 - 每1s生成一个segment文件，数量较多，问题如下：
@@ -77,7 +77,11 @@
 - 协调节点广播查询条件至相关的数据节点（分片可能主分片也可能副本分片）。
 - 数据节点返回给协调节点结果集文档ID（轻量）。
 - 协调节点汇总结果文档ID。
-- 协调节点根据文档ID查询文档，返回客户端结果
+- 协调节点根据文档ID查询文档，返回客户端结果。
+
+#### 全文检索快 ####
+- 分词(term)+倒排索引。
+- 内存中全量[分词前缀树](https://zhuanlan.zhihu.com/p/33671444)做索引。<br>![210420.es.term.png](https://img-blog.csdnimg.cn/20210421004315183.png)
 
 ## 参考 ##
 - [ElasticSearch底层原理浅析](https://blog.csdn.net/zkyfcx/article/details/79998197?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.channel_param&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.channel_param)
