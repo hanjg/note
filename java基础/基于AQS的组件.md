@@ -1,6 +1,6 @@
 [toc]
 ## AQS原理 ##
-- volatile int变量 **state** 标识共享资源。
+- **volatile** int变量 **state** 标识共享资源。
 - 如果资源空闲，当前线程锁定资源。其中**tryAcquire**由子类实现。
 - 如果资源被占，在等待队列中阻塞至唤醒。<br>![210329.aqs.png](https://img-blog.csdnimg.cn/20210406003513967.png)
 ```java
@@ -8,7 +8,6 @@
     public final void acquire(int arg) {
         if (!tryAcquire(arg) &&
             acquireQueued(addWaiter(Node.EXCLUSIVE), arg))
-			//中断唤醒过，标记已清除，需要再设置一次，避免被park挂起
             selfInterrupt();
     }
 	//释放资源
@@ -49,6 +48,7 @@
 ```
 
 - 队列中自旋，直到获取锁或[park阻塞](https://blog.csdn.net/weixin_39687783/article/details/85058686)。
+  - 中断恢复后需要清除中断标记，否则[线程无法park](https://cgiirw.github.io/2018/05/27/Interrupt_Ques/)。 
 ```java
     final boolean acquireQueued(final Node node, int arg) {
         boolean failed = true;
@@ -63,7 +63,8 @@
                     failed = false;
                     return interrupted;
                 }
-				//获取锁失败,过滤取消节点后如果前置节点为唤醒状态，则阻塞
+				//获取锁失败：压缩取消节点，如果前置节点为唤醒状态，则阻塞
+				//如果被interrupt唤醒，此时中断标记为true，后续需要再次设置中断标记
                 if (shouldParkAfterFailedAcquire(p, node) &&
                     parkAndCheckInterrupt())
                     interrupted = true;
@@ -77,14 +78,13 @@
     private final boolean parkAndCheckInterrupt() {
 		//阻塞线程
         LockSupport.park(this);
-		//清空中断标记，否则后续无法再park
+		//返回线程中断标记并清空，否则后续无法再park
         return Thread.interrupted();
     }
 ```
 
 - 设置中断标记。
-  - 唤醒后[interrupted()](https://blog.csdn.net/canot/article/details/51087772)会擦除中断标记，需要再设置标记一次。
-  - 有中断标记，[线程无法park挂起](https://cgiirw.github.io/2018/05/27/Interrupt_Ques/)。//TODO
+  - 如果被其他线程 [interrupt](https://blog.csdn.net/canot/article/details/51087772) 唤醒过，而不是unpark唤醒,会擦除中断标记，需要再设置标记一次。
 ```java
     static void selfInterrupt() {
         Thread.currentThread().interrupt();
@@ -117,10 +117,14 @@
     }
 ```
 
+### 线程中断 ###
+- [park,interrupt,sleep的伪代码](https://blog.csdn.net/anlian523/article/details/106752414)
+- [park,sleep,wait对比](https://juejin.cn/post/6844903984197533704)。
+
 ## ReentrantLock ##
 - 内部类Sync继承AbstractQueuedSynchronizer，分为公平锁FairSync和非公平锁NonfairSync两种实现。
 - 默认非公平锁。
-- [ReentrantLock解析](https://tech.meituan.com/2019/12/05/aqs-theory-and-apply.html)。
+- [从ReentrantLock的实现看AQS的原理及应用](https://tech.meituan.com/2019/12/05/aqs-theory-and-apply.html)。
 
 ### lock ###
 > 非公平锁为例

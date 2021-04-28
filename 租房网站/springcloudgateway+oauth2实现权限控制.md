@@ -1,6 +1,12 @@
 [toc]
 ## 鉴权服务 ##
 - [OAuth 2.0 的四种方式](http://www.ruanyifeng.com/blog/2019/04/oauth-grant-types.html)
+  - 授权码（避免令牌泄露）：
+    - A请求授权码，在B登录后返回A授权码。
+    - A在后端用授权码向B请求令牌。
+  - 隐藏式。前端直接返回令牌。
+  - 密码式。A用在B的用户名密码后端请求令牌。
+  - 凭证式。A获得公用令牌。
 - [OAuth2实现分析](https://blog.csdn.net/bluuusea/aricle/details/80284458)
 
 ### 基础配置 ###

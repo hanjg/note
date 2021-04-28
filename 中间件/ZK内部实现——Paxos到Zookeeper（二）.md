@@ -90,6 +90,9 @@
 1. 变更服务器状态。变为Looking。
 2. 同启动的1-5阶段。只是ZXID为本服务器的最大ZXID。
 
+> 大于半数的quorum才可选leader，[防止脑裂](https://www.cnblogs.com/kevingrace/p/12433503.html)<br>
+> 即使leader假死，再次接受个别客户端的写请求后由于zxid的代数小，同步follower时会被拒绝。
+
 ## 会话 ##
 - 会话状态转换。<br>![200622.session.png](https://img-blog.csdnimg.cn/20200624001103390.png)
 - Leader管理会话。
