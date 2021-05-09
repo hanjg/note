@@ -80,8 +80,7 @@
 - 协调节点根据文档ID查询文档，返回客户端结果。
 
 #### 全文检索快 ####
-- 分词(term)+倒排索引。
-- 内存中全量[分词前缀树](https://zhuanlan.zhihu.com/p/33671444)做索引。<br>![210420.es.term.png](https://img-blog.csdnimg.cn/20210421004315183.png)
+- 内存中全量[分词前缀树](https://zhuanlan.zhihu.com/p/33671444) -> 分词(term)[倒排索引](https://blog.csdn.net/sinat_35188997/article/details/83502920) ->文档id。<br>![210420.es.term.png](https://img-blog.csdnimg.cn/20210421004315183.png)
 
 ## 参考 ##
 - [ElasticSearch底层原理浅析](https://blog.csdn.net/zkyfcx/article/details/79998197?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.channel_param&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.channel_param)
