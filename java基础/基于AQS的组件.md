@@ -1,8 +1,11 @@
 [toc]
 ## AQS原理 ##
 - **volatile** int变量 **state** 标识共享资源。
-- 如果资源空闲，当前线程锁定资源。其中**tryAcquire**由子类实现。
+- 如果资源空闲，当前线程锁定资源。
 - 如果资源被占，在等待队列中阻塞至唤醒。<br>![210329.aqs.png](https://img-blog.csdnimg.cn/20210406003513967.png)
+
+### 独占式 ###
+#### acquire ####
 ```java
 	//获取资源
     public final void acquire(int arg) {
@@ -10,27 +13,16 @@
             acquireQueued(addWaiter(Node.EXCLUSIVE), arg))
             selfInterrupt();
     }
-	//释放资源
-    public final boolean release(int arg) {
-        if (tryRelease(arg)) {
-            Node h = head;
-            if (h != null && h.waitStatus != 0)
-                unparkSuccessor(h);
-            return true;
-        }
-        return false;
-    }
 ```
 
-### acquire ###
-- 尝试获取，**子类中实现**。
+- tryAcquire尝试获取，**子类中实现**，父类默认不支持。
 ```java
     protected boolean tryAcquire(int arg) {
         throw new UnsupportedOperationException();
     }	
 ```
 
-- 入队列。cas入队列尾，失败自旋。
+- addWaiter入队列。cas入队列尾，失败自旋。
 ```java
     private Node addWaiter(Node mode) {
         Node node = new Node(Thread.currentThread(), mode);
@@ -47,7 +39,7 @@
     }
 ```
 
-- 队列中自旋，直到获取锁或[park阻塞](https://blog.csdn.net/weixin_39687783/article/details/85058686)。
+- acquireQueued队列中自旋，直到获取锁或[park阻塞](https://blog.csdn.net/weixin_39687783/article/details/85058686)。
   - 中断恢复后需要清除中断标记，否则[线程无法park](https://cgiirw.github.io/2018/05/27/Interrupt_Ques/)。 
 ```java
     final boolean acquireQueued(final Node node, int arg) {
@@ -83,7 +75,7 @@
     }
 ```
 
-- 设置中断标记。
+- 线程被中断过，selfInterrupt设置中断标记。
   - 如果被其他线程 [interrupt](https://blog.csdn.net/canot/article/details/51087772) 唤醒过，而不是unpark唤醒,会擦除中断标记，需要再设置标记一次。
 ```java
     static void selfInterrupt() {
@@ -91,15 +83,28 @@
     }
 ```
 
-### release ###
-- 尝试释放。子类实现。
+#### release ####
+```java
+	//释放资源
+    public final boolean release(int arg) {
+        if (tryRelease(arg)) {
+            Node h = head;
+            if (h != null && h.waitStatus != 0)
+                unparkSuccessor(h);
+            return true;
+        }
+        return false;
+    }
+```
+
+- tryRelease尝试释放。子类实现。
 ```java
     protected boolean tryRelease(int arg) {
         throw new UnsupportedOperationException();
     }	
 ```
 
-- 唤醒队首阻塞的线程。
+- unparkSuccessor唤醒队首阻塞的线程。
 ```java
     private void unparkSuccessor(Node node) {
         int ws = node.waitStatus;
@@ -116,6 +121,120 @@
             LockSupport.unpark(s.thread);
     }
 ```
+
+### 共享式 ###
+#### acquireSharedInterruptibly ####
+```java
+    public final void acquireSharedInterruptibly(int arg)
+            throws InterruptedException {
+        if (Thread.interrupted())
+            throw new InterruptedException();
+        if (tryAcquireShared(arg) < 0)
+            doAcquireSharedInterruptibly(arg);
+    }
+```
+
+- tryAcquireShared尝试获取。子类中实现。
+- 获取失败doAcquireSharedInterruptibly中入队列，获取资源或者阻塞。
+```java
+    private void doAcquireSharedInterruptibly(int arg)
+        throws InterruptedException {
+		//入队列
+        final Node node = addWaiter(Node.SHARED);
+        boolean failed = true;
+        try {
+            for (;;) {
+                final Node p = node.predecessor();
+                if (p == head) {
+                    int r = tryAcquireShared(arg);
+                    if (r >= 0) {
+						//获取资源成功，该线程设为头结点并唤醒后续线程
+                        setHeadAndPropagate(node, r);
+                        p.next = null; // help GC
+                        failed = false;
+                        return;
+                    }
+                }
+				//阻塞直到被unpark
+                if (shouldParkAfterFailedAcquire(p, node) &&
+                    parkAndCheckInterrupt())
+                    throw new InterruptedException();
+            }
+        } finally {
+            if (failed)
+                cancelAcquire(node);
+        }
+    }
+
+    private void setHeadAndPropagate(Node node, int propagate) {
+        Node h = head;
+		//设为头结点
+        setHead(node);
+        if (propagate > 0 || h == null || h.waitStatus < 0 ||
+            (h = head) == null || h.waitStatus < 0) {
+            Node s = node.next;
+            if (s == null || s.isShared())
+                doReleaseShared();
+        }
+    }
+
+    private void doReleaseShared() {
+        for (;;) {
+            Node h = head;
+            if (h != null && h != tail) {
+                int ws = h.waitStatus;
+                if (ws == Node.SIGNAL) {
+                    if (!compareAndSetWaitStatus(h, Node.SIGNAL, 0))
+                        continue;            // loop to recheck cases
+					//唤醒后续线程
+                    unparkSuccessor(h);
+                }
+                else if (ws == 0 &&
+                         !compareAndSetWaitStatus(h, 0, Node.PROPAGATE))
+                    continue;                // loop on failed CAS
+            }
+            if (h == head)                   // loop if head changed
+                break;
+        }
+    }
+```
+
+
+#### releaseShared ####
+```java
+    public final boolean releaseShared(int arg) {
+        if (tryReleaseShared(arg)) {
+            doReleaseShared();
+            return true;
+        }
+        return false;
+    }
+```
+
+- tryReleaseShared尝试释放，子类实现。
+- doReleaseShared唤醒阻塞线程。
+```java
+    private void doReleaseShared() {
+        for (;;) {
+            Node h = head;
+            if (h != null && h != tail) {
+                int ws = h.waitStatus;
+                if (ws == Node.SIGNAL) {
+                    if (!compareAndSetWaitStatus(h, Node.SIGNAL, 0))
+                        continue;            // loop to recheck cases
+					//唤醒阻塞线程
+                    unparkSuccessor(h);
+                }
+                else if (ws == 0 &&
+                         !compareAndSetWaitStatus(h, 0, Node.PROPAGATE))
+                    continue;                // loop on failed CAS
+            }
+            if (h == head)                   // loop if head changed
+                break;
+        }
+    }
+```
+
 
 ### 线程中断 ###
 - [park,interrupt,sleep的伪代码](https://blog.csdn.net/anlian523/article/details/106752414)
@@ -200,6 +319,20 @@
         final Thread thread;
         //提交的业务逻辑
         Runnable firstTask;
+
+        protected boolean tryAcquire(int unused) {
+            if (compareAndSetState(0, 1)) {
+                setExclusiveOwnerThread(Thread.currentThread());
+                return true;
+            }
+            return false;
+        }
+
+        protected boolean tryRelease(int unused) {
+            setExclusiveOwnerThread(null);
+            setState(0);
+            return true;
+        }
 
         public void lock()        { acquire(1); }
         public void unlock()      { release(1); }
@@ -287,5 +420,46 @@
         } finally {
             mainLock.unlock();
         }
+    }
+```
+
+## CountDownLatch ##
+- 内部Sync类继承AQS，占用共享资源。
+```java
+ private static final class Sync extends AbstractQueuedSynchronizer {
+        Sync(int count) {
+            setState(count);
+        }
+        protected int tryAcquireShared(int acquires) {
+			//state为0获取成功
+            return (getState() == 0) ? 1 : -1;
+        }
+
+        protected boolean tryReleaseShared(int releases) {
+			//每次释放state--，到0释放成功
+            for (;;) {
+                int c = getState();
+                if (c == 0)
+                    return false;
+                int nextc = c-1;
+                if (compareAndSetState(c, nextc))
+                    return nextc == 0;
+            }
+        }
+    }
+```
+
+- CountDownLatch初始化时设置资源占用。
+- await获取资源，直到state为0.
+```java
+    public void await() throws InterruptedException {
+        sync.acquireSharedInterruptibly(1);
+    }
+```
+
+- countDown释放一个资源。
+```java
+    public void countDown() {
+        sync.releaseShared(1);
     }
 ```
