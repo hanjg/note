@@ -21,6 +21,8 @@
   - 主库校验用户，从请求的位置开始读本地**binlog**，发送给备库。
   - 备库接收binlog之后写本地中转日志**relay log**。
   - sql_thread解析中转日志并执行。
+- 默认异步复制，如果需要保证不丢数据，可使用[半同步](https://www.cnblogs.com/kevingrace/p/10228694.html)。
+  - master commit之后等待一个备库ack，再返回客户端。
 
 #### 并行复制 ####
 - 备库并行回放binlog。
