@@ -8,7 +8,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
 ```
 
 ## 内部结构 ##
-- Node数组，**链表**解决hash冲突。jdk1.8中当链表长度大于8时，会转化为**红黑树**。
+- Node数组，**链表**解决hash冲突。jdk1.8中put链表长度大于8时，会转化为**红黑树**。resize小于6时会转换为链表。
 - 结点
     - 链表节点：包含键、值、hash值、下一个结点引用。
     - 树结点：继承LinkedHashMap.Entry和HashMap.Node，包含红黑树相关结点。
@@ -196,7 +196,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
 
 ### resize ###
 - 使用新的大容量数组替代已有的小数组。结点在新的数组中的索引由hash值新增的bit是0还是1决定。
-  - node改为尾插法，解决[1.7之前头插法rehash死循环问题](https://blog.csdn.net/chenyiminnanjing/article/details/82706942)。
+  - node改为尾插法，解决[1.7之前头插法并发rehash死循环问题](https://blog.csdn.net/chenyiminnanjing/article/details/82706942)。
     - hashmap非线程安全，更新覆盖问题仍然存在。
 ```java
     final Node<K,V>[] resize() {

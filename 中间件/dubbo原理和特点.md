@@ -53,7 +53,7 @@
   - 没有[优雅关机](https://jaskey.github.io/blog/2019/09/30/spring-boot-dubbo-graceful-shutdown/)。
   - 大量consumer断连，但是仍然后部分流量到provider。断连事件和业务请求争抢有限的Netty IO资源，业务请求被延迟。解决方案：
     - provider关机时先发送readonly，等待一段时间之后再摘除zk节点。
-    - consumer收到provider下线请求后，将代理类设为不可用，等待后再销毁。
+    - consumer收到provider下线请求后，将代理类设为不可用，等待后再销毁断开连接。
 
 ## 文档 ##
 - [官网](https://dubbo.apache.org/zh-cn/index.html)。
