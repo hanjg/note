@@ -105,15 +105,17 @@ public class BeanAnnotation
 ```
 
 ### 生命周期 ###
-- 包括：**定义**、**初始化**、**使用**、**销毁**。
-- 初始化：
+- **实例化**。
+- **填充属性**。
+- **初始化**：
     - 实现org.springframework.beans.factory.InitializingBean接口，覆盖afterPropertiesSet方法。
     - bean中配置init-method。
-- 销毁：
+    - 各种Aware接口。
+    - 实现BeanPostProcessor接口，调用 postProcessBeforeInitialzation和postProcessAfterInitialization方法。
+- **销毁**：
     - 实现org.springframework.beans.factory.DisposableBean接口，覆盖destroy方法。
     - bean中配置destroy-method。
-- 默认的初始化和销毁方法：
-    - **beans** 中配置default-init-method和default-destroy-method。
+    - 实现DisposableBean接口，调用destroy方法。
 ```java
 public class BeanLifeCycle implements InitializingBean, DisposableBean{}
 ```
@@ -485,4 +487,6 @@ public class OneAspect
 @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, readOnly = false)
 ```
 
-
+## 参考 ##
+- [为了忽悠大厂面试官，熬夜总结了这些Spring面试题](https://mp.weixin.qq.com/s/9H8yX2CUSbFoE-6YshUbbA)
+- [深入理解 Spring finishBeanFactoryInitialization](https://www.cnblogs.com/ZhuChangwu/p/11755973.html)

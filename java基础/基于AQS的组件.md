@@ -235,9 +235,15 @@
     }
 ```
 
-
 ### 线程中断 ###
+- native实现中两个变量标识线程中断相关的状态：
+  - 中断状态：boolean，初始false
+  - 免挂起许可：int(0,1)，初始0
 - [park,interrupt,sleep的伪代码](https://blog.csdn.net/anlian523/article/details/106752414)
+  - park：许可=1或中断状态=true，不可挂起。挂起恢复后消耗许可。
+  - unpark：线程挂起才唤醒，增加许可。
+  - interrupt：中断状态改为true，unpark。
+  - sleep：挂起前后，如果中断状态=true，改成false后抛异常。
 - [park,sleep,wait对比](https://juejin.cn/post/6844903984197533704)。
 
 ## ReentrantLock ##

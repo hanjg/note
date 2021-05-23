@@ -41,6 +41,7 @@
 - 最大停顿时间可预测。每次处理部分堆实现停顿时间限制。
 - 老年代也复制，碎片有限。
 - 写屏障，维护[RememberedSet](https://blog.csdn.net/FMC_WBL/article/details/107864334)，且Rset占据空间较多，5-20%。
+  - RememberedSet：point-into结构，key：引用的region地址，value：引用的对象[卡页](https://blog.csdn.net/luzhensmart/article/details/106052574)集合
 
 ## ZGC ##
 - 不分代。

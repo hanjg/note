@@ -1,4 +1,4 @@
-[toc]
+@[toc]
 ## 面向对象和面向过程的区别 ##
 - 面向过程优点：性能高，因为类调用的时候需要实例化，开销比较大；
 - 面向对象优点：易维护、易复用、易扩展，因为面向对象有封装、继承、多态的特性，可以设计出低耦合的系统，使系统更加灵活、更加易于维护。
@@ -178,11 +178,11 @@
 - Set无序、元素不重复，主要实现类有HashSet（底层用hashmap实现，基于哈希表）和TreeSet（红黑树）
 - List有序、元素可重复，主要实现类有ArrayList,LinkedList,Vector。
 - Map和Collection接口无关，Map是key对value的映射集合,key不能重复，value可以重复，主要实现类有HashMap,TreeMap,HashTable。
-<br>![这里写图片描述](http://img.blog.csdn.net/20171108111855814?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfNDAzNjk4Mjk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
-<br>![这里写图片描述](http://img.blog.csdn.net/20171108111917770?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfNDAzNjk4Mjk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+<br>![这里写图片描述](https://img-blog.csdnimg.cn/img_convert/f8a8d1510321f4f74ceb262c892f88c1.png)
+<br>![这里写图片描述](https://img-blog.csdnimg.cn/img_convert/aea52911487200c572e3aecc62855dd9.png)
 
 ## HashMap实现原理 ##
-- ![这里写图片描述](http://img.blog.csdn.net/20171108112059959?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfNDAzNjk4Mjk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+- ![这里写图片描述](https://img-blog.csdnimg.cn/img_convert/d3002f8288ec72b39282be73233cb75a.png)
 - HashMap 实际上是一个链表的数组(***jdk1.8以后链表长度大于8转为红黑树***)。
 - 如果两个 Entry 的 key 的 hashCode() 返回值相同，那它们的存储位置相同。如果这两个 Entry 的 key 通过 equals 比较返回 true，新添加 Entry 的 value 将覆盖集合中原有 Entry 的 value，但 key 不会覆盖;如果这两个 Entry 的 key 通过 equals 比较返回 false，新添加的 Entry 将与集合中原有 Entry 形成 Entry 链，而且新添加的 Entry 位于 Entry 链的头部。<br>
 出自：[http://blog.csdn.net/caihaijiang/article/details/6280251](http://blog.csdn.net/caihaijiang/article/details/6280251)
@@ -321,32 +321,35 @@
 4. 运行Callable任务可拿到一个Future对象，Future表示异步计算的结果。
 
 
-## 线程状态 ##
-![这里写图片描述](http://img.blog.csdn.net/20171108112326508?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfNDAzNjk4Mjk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+## java线程 ##
+### 6种线程状态 ###
+1. 新建：new Thread()。
+2. 运行：Thread.start()。
+	1. 运行中：获得CPU时间后执行run()。
+	2. 就绪：用完cpu时间片、yield。
+3. 阻塞：阻塞在等待monitor锁，synchronized
+4. 等待：等待另一个线程执行某个动作，wait,park
+5. 超时等待。wait,parkNanos
+6. 终止：run正常退出；未捕获异常终止run。
 
-1. 新建状态：new Thread()。
-2. 就绪状态：tread.start()。
-3. 运行状态：获得CPU时间后执行run()。
-4. 阻塞状态：例如sleep，io。
-5. 死亡状态：run正常退出；未捕获异常终止run。<br>
-[http://blog.csdn.net/peter_teng/article/details/10197785](http://blog.csdn.net/peter_teng/article/details/10197785 "http://blog.csdn.net/peter_teng/article/details/10197785")
+- [ref](https://blog.csdn.net/pange1991/article/details/53860651)<br>![210520.java.thread.png](https://img-blog.csdnimg.cn/2021052400123752.png)
 
-## 线程阻塞的原因 ##
+### 线程阻塞的原因 ###
 - 线程执行了Thread.sleep(int millsecond)方法，当前线程放弃CPU，睡眠一段时间，然后再恢复执行。
 - 线程执行了一个对象的wait()方法，直接进入阻塞状态，等待其他线程执行notify()或者notifyAll()方法。
 - 线程执行一段同步代码，但是尚且无法获得相关的同步锁，只能进入阻塞状态，等到获取了同步锁，才能回复执行。
 - 线程执行某些IO操作，因为等待相关的资源而进入了阻塞状态。比如说监听system.in，但是尚且没有收到键盘的输入，则进入阻塞状态。
 
 
-## 如何终止一个线程 ##
+### 如何终止一个线程 ###
 1. 线程里面是一个循环。设置一个标志位，在循环检查的时候跳出循环。
 2. 线程因为sleep,wait,join(thread1.join()主线程会等待thread1运行结束后，才会继续向下运行)等阻塞或者挂起的时候。使用interrupt，产生InterruptedException异常，从而跳出线程。
 
-## 什么是线程安全 ##
+### 什么是线程安全 ###
 - 多个线程可能会同时运行一段代码，每次运行的结果和单线程运行的结果是一样的，而且其他变量的值也和预期的是一样的。
 - 《Java Concurrency In Practice》：当多个线程访问同一个对象时，如果不用考虑这些线程在运行时环境下的调度和交替执行，也不需要进行额外的同步，或者调用方法进行任何其他的协调操作，调用这个对象的行为都可以获得正确的结果，那这个对象就是线程安全的。
 
-## 如何保证线程安全 ##
+### 如何保证线程安全 ###
 - 对非安全的代码进行加锁，synchronized,volatile,lock等。
 - 使用线程安全的类。
 - 多线程并发情况下，线程共享的变量改为方法级的局部变量。
@@ -355,18 +358,38 @@
 - volatile具有**可见性**：修饰的成员变量在每次被线程访问时，都强迫从共享内存中重读该成员变量的值。而且，当成员变量发生变化时，强迫线程将变化值回写到共享内存。这样在任何时刻，两个不同的线程总是看到某个成员变量的同一个值。
 - volatile**不具有原子性**：允许超过一个线程访问该数据。(原子性：就是某系列的操作步骤要么全部执行，要么都不执行，例如:i++分为三个步骤执行，所以仅靠volatile不能保证线程的安全性)
 - 要使volatile提供理想的线程安全，必须同时满足两个条件：1、对变量的写操作不依赖于当前值；2、该变量没有包含在具有其他变量的不变式中。
-- volatile会**禁止指令重排序优化**。
+- volatile会**禁止指令重排序优化**，多线程场景的正确性。
 
-### 原理 ###
-
-![](http://i.imgur.com/A0P7hkC.png)
-
+### 可见性 ###
 - volatile主要用在多个线程感知实例变量被更改了场合，从而使得各个线程获得最新的值。它使得**本地缓存无效**，强制线程每从**主内存**中读到volatile修饰的变量，而不是从线程的私有内存中读取变量。**修改变量之后写入主内存**。从而保证了数据的可见性。
 - 从图中可以看出：
     1. 每个线程都有一个自己的本地内存空间。线程执行时，先把变量从主内存读取到线程自己的本地内存空间，然后再对该变量进行操作(volatile强制线程从主内存中取 volatile修饰的变量)。
     2. 对该变量操作完后刷新回主内存。
 - 参考：[http://blog.csdn.net/feier7501/article/details/20001083](http://blog.csdn.net/feier7501/article/details/20001083 "http://blog.csdn.net/feier7501/article/details/20001083")
 
+### 禁用指令重排 ###
+- 例子：懒汉式单例。
+  - 禁用了new Singleton()的指令重排。
+  - 命令分为三步：1.分配内存；2.初始化对象；3.singleton引用赋值。
+  - 如果之上的2,3步重排，多线程场景可能拿到**未初始化**的对象。
+```java
+public class Singleton {
+    private static volatile Singleton singleton;
+    private Singleton() {
+    }
+    public static Singleton getInstance() {
+        if (singleton == null) {
+            synchronized (Singleton.class) {
+                if (singleton == null) {
+                    //防止指令重排
+                    singleton = new Singleton();
+                }
+            }
+        }
+        return singleton;
+    }
+}
+```
 
 ## synchronized如何使用 ##
 ### 使用synchronized同步方法和域 ###
@@ -376,14 +399,14 @@
 - synchronized(类.class){}，需要获得类锁。
 - synchronized(this,其他对象)，需要获得对象锁
 
-## synchronized和Lock的区别 ##
+### synchronized和Lock的区别 ###
 - Lock能完成synchronized所实现的所有功能。
 - Lock的锁定是通过代码实现的，synchronized是在JVM层次上实现的
 - Lock需要手动在finally从句中释放锁，synchronized自动释放锁。
 - Lock可以通过tryLock方法用非阻塞方式去拿锁。
 - Lock锁的范围：代码块；synchronized锁的范围：代码块，对象，类。
 
-## volatile 与 synchronized 的比较 ##
+### volatile 与 synchronized 的比较 ###
  - volatile轻量级，只能修饰变量。synchronized重量级，还可修饰方法
  - volatile只能保证数据的可见性，不能用来同步，因为多个线程并发访问volatile修饰的变量不会阻塞。
  - synchronized不仅保证可见性，而且还保证原子性，因为，只有获得了锁的线程才能进入临界区，从而保证临界区中的所有语句都全部执行。多个线程争抢synchronized锁对象时，会出现阻塞。
@@ -455,7 +478,7 @@
 ### 原因 ###
 - 如果并发的线程数量很多，并且每个线程执行一个时间很短的任务就结束，这样频繁创建线程会大大降低系统的效率。
 - 使用线程池可以使得线程复用，即线程执行完一个任务不被销毁而是继续执行其他任务。
-#### 底层实现####
+#### 底层实现 ####
 - ThreadPoolExecutor类。
 ### 任务处理策略 ###
 - 线程池中的当前线程数poolSize。
@@ -552,13 +575,13 @@
 - 每个线程都有一个私有的本地内存，储存了该线程读写共享变量的副本。
 - 本地内存是一个抽象概念，涵盖缓存、写缓冲区、寄存器、其他硬件和编译器优化
 
-![这里写图片描述](http://img.blog.csdn.net/20171108112743774?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfNDAzNjk4Mjk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+![这里写图片描述](https://img-blog.csdnimg.cn/img_convert/8afc5b625c5a4cbc81d006b2f50f91b4.png)
 
 #### 通信的实现 ####
 1. 首先，线程A把本地内存A中更新过的共享变量刷新到主内存中去。
 2. 然后，线程B到主内存中去读取线程A之前已更新过的共享变量。 
 
-![这里写图片描述](http://img.blog.csdn.net/20171108113108501?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfNDAzNjk4Mjk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+![这里写图片描述](https://img-blog.csdnimg.cn/img_convert/51706c71f788a7ede0551df07c0a238f.png)
 
 ### JVM对java内存模型的实现 ###
 - 程序计数器：指向当前所执行的字节码。
@@ -567,18 +590,18 @@
 - java堆：存放对象实例。
 - 方法区：存储已被虚拟机加载的类信息、常量、静态变量、即时编译器变异后的代码等。
 
-![这里写图片描述](http://img.blog.csdn.net/20171108113441269?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfNDAzNjk4Mjk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+![这里写图片描述](https://img-blog.csdnimg.cn/img_convert/75d90b487772371ac04db2636374bfa7.png)
 
 
 ### 硬件内存模型 ###
 - CPU寄存器、CPU缓存、主存。
 
-![这里写图片描述](http://img.blog.csdn.net/20171108113612918?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfNDAzNjk4Mjk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+![这里写图片描述](https://img-blog.csdnimg.cn/img_convert/6271d00d506ef29a032ddcebb523be7e.png)
 
 ### JMM和硬件的关系 ###
 - 交叉关系。
 
-![这里写图片描述](http://img.blog.csdn.net/20171108113512972?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfNDAzNjk4Mjk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+![这里写图片描述](https://img-blog.csdnimg.cn/img_convert/a510242012667d1e28745948bd44644b.png)
 
 
 ### 参考 ###
@@ -721,7 +744,7 @@ Java的连接模型允许用户运行时扩展引用程序，既可以通过当�
 Class.forName的一个很常见的用法就是在加载数据库驱动的时候。如 Class.forName("org.apache.derby.jdbc.EmbeddedDriver").newInstance()用来加载 Apache Derby 数据库的驱动。 
 
 #### 3.2 用户自定义类加载器 ####
-![这里写图片描述](http://img.blog.csdn.net/20171108114028575?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfNDAzNjk4Mjk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+![这里写图片描述](https://img-blog.csdnimg.cn/img_convert/ba2f066eb7d3fac479cc8a063bdccebc.png)
 
 ### 4. 常见问题分析 ###
 #### 4.1 由不同的类加载器加载的指定类还是相同的类型吗？ ####
