@@ -95,8 +95,9 @@ func main() {
 - go.mod同级目录下命令```go install```，打包之后的exe文件在```gopath/bin```下。
 - 双击执行，浏览器访问。<br>![210714.go.server.png](https://img-blog.csdnimg.cn/2021071410445098.png)
 
-## 参考 ##
+## 参考资料 ##
 - [sdk文档](https://cloud.tencent.com/developer/doc/1101) 
-- [菜鸟教程](https://www.runoob.com/go/go-tutorial.html)
-- [极客时间](https://time.geekbang.org/column/intro/100013101)
+- [go菜鸟教程](https://www.runoob.com/go/go-tutorial.html)
+- [Go语言核心36讲](https://time.geekbang.org/column/intro/100013101)
 - [网易云课堂视频](https://study.163.com/course/courseLearn.htm?courseId=306002&from=study#/learn/video?lessonId=421012&courseId=306002)
+- [gin实战](https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzI3MjU4Njk3Ng==&action=getalbum&album_id=1362784031968149504&scene=173&from_msgid=2247484393&from_itemidx=1&count=3&nolastread=1#wechat_redirect)
