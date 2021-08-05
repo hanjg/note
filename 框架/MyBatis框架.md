@@ -279,5 +279,28 @@ public class PageInterceptor implements Interceptor {
   </insert>
 ```
 
+## 坑 ##
+### 泛型擦除 ###
+- 调用mapper返回 GoodsExtendedAttribute 对象列表。编译不报错，运行报错。
+```xml
+<select id="selectGoodsIdByExample" resultMap="BaseResultMap" parameterType="xxxx.GoodsExtendedAttributeExample">
+    select goods_id from goods_extended_attribute
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause"/>
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+```
+```java
+List<Long> list =  goodsExtendedAttributeMapper.selectGoodsIdByExample(goodsExample);
+```
+
+### 资源路径 ###
+- IDEA resource中显示的包路径对应实际目录可能有两种：
+  - D:\project\gin\gin\gin-repository\src\main\resources\base\com\yiran\service\gin\repository
+  - D:\project\gin\gin\gin-repository\src\main\resources\base\com.yiran.service.gin.repository
+- ![210805.mybatis.png](https://img-blog.csdnimg.cn/1077adef62c8439bbb4a30b8b4c3963b.png)
 ## 参考 ##
 - [https://mp.weixin.qq.com/s/_W2K9bv6EQqBg6qiwUE0jQ](https://mp.weixin.qq.com/s/_W2K9bv6EQqBg6qiwUE0jQ)

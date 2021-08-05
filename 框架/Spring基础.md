@@ -79,6 +79,7 @@ public class BeanAnnotation
 <context:component-scan base-package="com.hjg.spring.bean.annotation"
     name-generator="xxxxx"/>
 ```
+- 同名的bean会覆盖，最后加载的生效
 
 ### 作用域 ###
 #### xml配置 ####
@@ -105,6 +106,7 @@ public class BeanAnnotation
 ```
 
 ### 生命周期 ###
+- ![210805.bean.png](https://img-blog.csdnimg.cn/2404bcd791224124b83dc76de60a0776.png)
 - **实例化**。
 - **填充属性**。
 - **初始化**：
@@ -112,6 +114,7 @@ public class BeanAnnotation
     - bean中配置init-method。
     - 各种Aware接口。
     - 实现BeanPostProcessor接口，调用 postProcessBeforeInitialzation和postProcessAfterInitialization方法。
+      - [如监控bean启动时间](https://mp.weixin.qq.com/s/a_wfIh8roHrbG0_jXFT8Lw)
 - **销毁**：
     - 实现org.springframework.beans.factory.DisposableBean接口，覆盖destroy方法。
     - bean中配置destroy-method。
@@ -132,6 +135,7 @@ public class BeanLifeCycle implements InitializingBean, DisposableBean{}
 ```
 - 通过实现接口的初始化和销毁在配置的初始化和销毁之前执行。
 - 默认的初始化和销毁方法可以不配置，也可以被覆盖。
+
 
 ### Aware接口 ###
 - 实现Aware接口的bean在初始化之后可以**获取并操作资源**。
