@@ -2,6 +2,17 @@
 ## 列表 ##
 ### 数组 ###
 - slice对标java ArrayList，长度可变，复制扩容。<br>![210905.go.slice.png](https://img-blog.csdnimg.cn/9b106f46d909465ebf00d450646b53f4.png)
+- range遍历的时候**第一个参数为下标**，第二个才是值。如果遍历值，需要忽略下标。
+```go
+	for index := range o.TicketIdList {
+		//一个参数为下标
+	}
+	for _, ticketId := range o.TicketIdList {
+		//两个参数为下标+值
+		ticketIdList = append(ticketIdList, int64(ticketId))
+	}
+```
+
 
 ### 链表 ###
 - List对标java LinkedList
