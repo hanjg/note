@@ -12,15 +12,15 @@
   - 同一个套接字**优先处理AE_READABLE**事件。
 
 ### I/O多路复用程序 ###
-- 监听多个套接字，并通过**队列**传递产生了事件的套接字给下游事件分派器。<br>![210218.redis.queue.png](https://img-blog.csdnimg.cn/2021021823403922.png)
+- 监听多个套接字(Socket)，并通过**队列**传递产生了事件的套接字给下游事件分派器。<br>![210218.redis.queue.png](https://img-blog.csdnimg.cn/2021021823403922.png)
 - [基于 epoll 实现](https://blog.csdn.net/wxy941011/article/details/80274233)。epoll优势：
-  - 不限制最大连接数，上限为文件描述符。
+  - 不限制最大连接数，连接数上限为文件描述符。
   - 只关注活跃连接，不随socket增长线性下降。
   - [mmap共享内存](https://blog.csdn.net/luckywang1103/article/details/50619251)，避免fd列表在内核和用户之间copy。
 
 #### 3种流程 ####
 - select：
-  - 用户态copy fd数组至内核态。
+  - 用户态copy fd(文件描述符)数组至内核态。
   - 内核遍历fd，查看是否有IO事件。此时select阻塞。
   - 返回给用户态可读fd个数，用户态遍历具体可读fd。
 - poll:同select，仅取消select 1024个fd的限制。
