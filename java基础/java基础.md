@@ -259,7 +259,7 @@
 - Error类一般指与虚拟机相关的问题，比如系统崩溃，虚拟机错误，内存空间不足，方法调用栈溢出。这类错误导致的应用程序中断仅靠程序本身无法恢复和预防，应该终止程序。
 - Exception类表示程序可以处理的异常，可以捕获并且可能恢复。这类异常应该尽可能处理。
 
-## checked和unchecked异常##
+## checked和unchecked异常 ##
 ### unchecked Exception ###
 - 通常是自身的问题。
 - 程序瑕疵或者逻辑错误，运行时无法恢复。
@@ -391,24 +391,38 @@ public class Singleton {
 }
 ```
 
-## synchronized如何使用 ##
-### 使用synchronized同步方法和域 ###
-- 静态方法或域，需要获得类锁。
-- 非静态方法或域，需要获得对象锁。
-### 使用synchronized同步代码段 ###
-- synchronized(类.class){}，需要获得类锁。
-- synchronized(this,其他对象)，需要获得对象锁
+## synchronized关键字 ##
+### 使用方式 ###
+- 同步方法和对象
+	- **静态**方法或对象，需要获得**类锁**。
+	- **非静态**方法或对象，需要获得**对象锁**。
+- 同步代码段
+	- synchronized(类.class){}，需要获得类锁。
+	- synchronized(this,其他对象)，需要获得对象锁
+
+### 实现原理 ###
+- [monitor对象](https://blog.csdn.net/qq_35190492/article/details/104691668)，底层是操作系统互斥锁。<br>![211229.monitor.png](https://img-blog.csdnimg.cn/535cd45178aa4a1698d89d049635ee05.png)
+- 对象头指向monitor对象
+- monitor被某个线程持有后，处于锁定状态，owner指向持有线程
+- 两个队列存放等待获取锁的线程
+
+### 锁升级 ###
+- [升级](https://www.cnblogs.com/kubidemanong/p/9520071.html)
+- Jdk1.6后为了减少获得锁和释放锁带来的性能消耗而引入的偏向锁和轻量级锁。
+	- 优先偏向锁。偏向第一个线程，持有偏向锁的线程将不需要进行同步操作。
+	- 失败升级为CAS轻量级锁
+	- 多次重试后升级为重量级锁<br>![211229.sync.upgrade.png](https://img-blog.csdnimg.cn/30c357ef8daa4313b6c7f36400a465d3.png)
 
 ### synchronized和Lock的区别 ###
 - Lock能完成synchronized所实现的所有功能。
-- Lock的锁定是通过代码实现的，synchronized是在JVM层次上实现的
+- Lock的锁定是通过[AQS](https://blog.csdn.net/qq_40369829/article/details/115451552?spm=1001.2014.3001.5501)代码实现的，synchronized是在JVM层次上实现的
 - Lock需要手动在finally从句中释放锁，synchronized自动释放锁。
 - Lock可以通过tryLock方法用非阻塞方式去拿锁。
 - Lock锁的范围：代码块；synchronized锁的范围：代码块，对象，类。
 
 ### volatile 与 synchronized 的比较 ###
  - volatile轻量级，只能修饰变量。synchronized重量级，还可修饰方法
- - volatile只能保证数据的可见性，不能用来同步，因为多个线程并发访问volatile修饰的变量不会阻塞。
+ - volatile只能保证数据的可见性，不能保证原子性，因为多个线程并发访问volatile修饰的变量不会阻塞。
  - synchronized不仅保证可见性，而且还保证原子性，因为，只有获得了锁的线程才能进入临界区，从而保证临界区中的所有语句都全部执行。多个线程争抢synchronized锁对象时，会出现阻塞。
 
 ## 多线程如何进行信息交互 ##
