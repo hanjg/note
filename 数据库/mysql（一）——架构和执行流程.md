@@ -104,51 +104,14 @@
 - 刷脏页时double write避免损坏数据页。
 
 ## Innodb特性 ##
-### change buffer ###
-- 前身是insert buffer。change buffer在insert的基础的上，支持update，delete。
-- 使用条件：  
-  - 更新**非聚集索引**。
-  - 索引**非唯一**（非Unique）。
-- 优点：减少索引页不在内存中时随机读磁盘的开销。
-- 缺点：
-  - 大量写时宕机，导致缓冲池数据未合并，从redo恢复时间较长。
-  - 大量写时占用过多的缓冲池内存，最多1/2。
-- [唯一索引和普通索引对比](https://time.geekbang.org/column/article/70848)。
-- ```insert into t(id,k) values(id1,k1),(id2,k2);```一个索引在内存，一个在磁盘。
-
-#### 写流程 ####
-- ![201108.update.buffer.png](https://static001.geekbang.org/resource/image/98/a3/980a2b786f0ea7adabef2e64fb4c4ca3.png)
-- Page1 在内存中，直接更新内存。
-- Page2 没有在内存中，就在内存的 change buffer 区域，记录下插入行的信息。
-- 将上述两个动作记入 redo log。
-
-#### 读流程 ####
-- ![201108.select.buffer.png](https://static001.geekbang.org/resource/image/6d/8e/6dc743577af1dbcbb8550bddbfc5f98e.png)
-- 读page1直接返回。
-- 读page2，从磁盘读取Page2之后Merge change buffer中的日志返回，merge过程如下：
-  - 磁盘读page2.
-  - 在page2上应用change buffer里相关的记录，得到新的数据页。
-  - 写redo，包括数据页和change buffer的变更。
-
-#### 合并时机 ####
-- 辅助索引页被读到缓冲池，如select。
-- 追踪辅助索引页的Insert Buffer Bitmap监测到辅助索引页可用空间不够。
-- Master线程刷新多个索引页。
-
 ### 两次写 ###
 - 原因：
-  - 部分写失效：将缓冲池中的页写到表中，进行到一半数据库宕机，磁盘数据页的数据损坏。<br>
+  - **部分写失效**：将缓冲池中的页写到表中，进行到一半数据库宕机，磁盘数据页的数据损坏。<br>
   - redo日志只记录对表的操作，重做需要页的原始副本，对已经损坏的页没有意义。
 - 流程：
   - **刷脏页**时，先写内存中的doublewrite buffer（默认128个数据页，每个16K）。
   - 再通过buffer先后写到共享表空间**脏页副本**（顺序写）和**磁盘**（随机写）。
   - 崩溃恢复时，直接使用数据页的共享表空间副本还原原始数据页，再应用Redo log。<br> ![190816.double.png](https://img-blog.csdnimg.cn/20190816125700861.png)
-
-### 自适应hash索引 ###
-- 从缓冲池的B+树页构建，存在缓冲池**自适应哈希索引区**，是对**页**的索引，不是整张表的。
-- 条件：
-  - 连续访问模式（查询条件）一致。
-  - 次数超过页中记录/16。
 
 ### 异步IO ###
 - 或者叫并发IO，索引扫描、刷新脏页等。
@@ -169,16 +132,17 @@
 ### 长事务 ###
 - 后果：
   - 回滚段占用过多空间。
-  - 占用锁资源。
-- 措施：
+  - 占用锁资源，影响其他DML执行。
+  - binlog长，主从延迟。
+- [措施](https://time.geekbang.org/column/article/69236)：
+  - 写sql时考虑更新行数，必要时explain之后上线
   - 尽量set autocommit = 1自动提交。
   - 少用或不用只读事务。
   - 通过 SET MAX_EXECUTION_TIME 设置最长执行时间。
-  - [参考](https://time.geekbang.org/column/article/69236)。
 
 ## 自增id ##
 ### 自增主键 ###
-#### 自增值存储 ####
+#### 存储 ####
 - MyISAM：数据文件。
 - Innodb：
   - 5.7和之前存在内存中，每次启动时找最大主键值然后+1。
@@ -194,7 +158,7 @@
   - 0。语句执行释放锁。
   - 1。默认值
     - 普通insert，申请id之后释放。
-    - ```insert..select```之类的批量插入，语句结束之后释放。[一致性考虑](https://time.geekbang.org/column/article/80531)。
+    - ```insert..select```之类的批量插入，语句结束之后释放。binlog_format=statement的时候，[主从一致性考虑](https://time.geekbang.org/column/article/80531)。
   - 2。申请id之后释放。
 - 自增到最大值之后不变，下一次insert主键冲突。
 
@@ -207,7 +171,7 @@
 - 修改操作时分配，只读事务不分配。
   - 只读事务不影响可见性，减少活跃事务数组的大小。
   - 减少申请事务Id次数和申请锁冲突。
-- 事务id到2^48-1之后从0开始，[会有脏读问题](https://time.geekbang.org/column/article/83183)。
+- 事务id到2^48-1之后从0开始，[会有脏读问题](https://time.geekbang.org/column/article/83183)。不过生产中考虑写入的qps，基本不会遇到。
   - 事务B的事务id小于事务A的低水位造成。<br>![201125.dirty.png](https://static001.geekbang.org/resource/image/13/c0/13735f955a437a848895787bf9c723c0.png)
 
 ### 线程id ###
