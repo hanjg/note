@@ -1,4 +1,5 @@
-[toc]
+
+@[toc]
 ## 特点 ##
 1. 降低组件之间的耦合度，实现软件各层之间的**解耦**。 
 2. 可以使用容器提供的众多服务，如：**事务管理服务**、**消息服务**等等。无需手工控制事务，也不需处理复杂的事务传播。
@@ -32,7 +33,7 @@
   </servlet>
 ```
 
-### 注入 ###
+### 依赖注入（DI） ###
 - 在启动Spring容器加载bean配置时，完成对变量的赋值。
 - 设值注入：
 ```xml
@@ -47,69 +48,64 @@
   </bean>
 ```
 
+### 容器运行流程
+![在这里插入图片描述](https://img-blog.csdnimg.cn/3617e18fefa74a59adbc27529756ce24.png#pic_center)
+
 ## Bean ##
-### 配置项 ###
-- 包括id, class, scope ,constructor arguments, properties, autowiring mode, lazy-initialization mode, initialization/destruction method。
-- 其中class是必须项。
-
-### 开启注解 ###
-- 可以自动发现并注册@Component, @Repository, @Service, @Controller注解的类，或者使用使用Component的自定义注解。
-- 开启使用注解的配置, context:component-scan：
-```xml
- <context:component-scan base-package="com.hjg.spring.bean.annotation"/>
-```
-
 ### Bean的定义 ###
-#### xml配置 ####
-- bean的id大小写敏感。
-- 如果bean不配置id，默认id为：包名.类名#从0开始的自然数(如果为0，则#0可以省略)。
-- 如果bean只配置了name属性，但是没有配置id属性，默认id=name。
-```xml
-<bean id="beanAnnotation" class="com.hjg.spring.bean.annotation.componentScope.BeanAnnotation"></bean>
-```
-
-#### 注解 ####
-- @Componen等注解的值为bean的id，默认为首字母小写的类名
-```java
-@Component("beanAnnotation")
-public class BeanAnnotation
-```
-- 可以在name-generator属性中自定义命名策略，需要实现 **BeanNameGenerator** 接口。
-```xml
-<context:component-scan base-package="com.hjg.spring.bean.annotation"
-    name-generator="xxxxx"/>
-```
-- 同名的bean会覆盖，最后加载的生效
+- xml配置
+	- 包括id, class, scope ,constructor arguments, properties, autowiring mode, lazy-initialization mode, initialization/destruction method。
+	- 其中class是必须项。
+	- bean的id大小写敏感。如果bean不配置id，默认id为：包名.类名#从0开始的自然数(如果为0，则#0可以省略)。
+	- 如果bean只配置了name属性，但是没有配置id属性，默认id=name。
+	```xml
+	<bean id="beanAnnotation" class="com.hjg.spring.bean.annotation.componentScope.BeanAnnotation"></bean>
+	```
+-  注解
+	- 可以自动发现并注册@Component, @Repository, @Service, @Controller注解的类，或者使用使用Component的自定义注解。
+	- 开启使用注解的配置, context:component-scan：
+	```xml
+	 <context:component-scan base-package="com.hjg.spring.bean.annotation"/>
+	```
+	
+	- @Componen等注解的值为bean的id，默认为首字母小写的类名
+	```java
+	@Component("beanAnnotation")
+	public class BeanAnnotation
+	```
+	- 可以在name-generator属性中自定义命名策略，需要实现 **BeanNameGenerator** 接口。
+	```xml
+	<context:component-scan base-package="com.hjg.spring.bean.annotation"
+	    name-generator="xxxxx"/>
+	```
+	- 同名的bean会覆盖，最后加载的生效
 
 ### 作用域 ###
-#### xml配置 ####
-- 5中作用域：
-    1. singleton：单例，一个bean容器中只存在一个实例。
-    2. prototype：每次请求创建新的实例，此时 **destroy方法不生效** ，即对象资源的回收交由应用程序而不是spring框架完成。
-    3. request：每次http请求创建一个实例，且在当前request中有效。
-    4. session：每次http请求创建一个实例，且在当前session中有效。
-    5. global session：在基于portlet的web中有效，否则同session。
-- scope的默认模式为单例，singleton。
-```xml
- <bean id="beanScope" class="com.hjg.spring.bean.scope.BeanScope" scope="prototype"></bean>
-```
-
-#### 注解 ####
-- @Scope默认为singleton。
-```java
-@Scope("prototype")
-public class BeanAnnotation 
-```
-- 可以在scope-resolver属性中自定义scope策略，需要实现 **ScopeMetadataResolver** 接口。
-```xml
-<context:component-scan base-package="com.hjg.spring.bean.annotation" scope-resolver="xxxxx"/>
-```
-
-### 生命周期 ###
-- ![210805.bean.png](https://img-blog.csdnimg.cn/2404bcd791224124b83dc76de60a0776.png)
-- **实例化**。
-- **填充属性**。
+- xml配置
+	- 5种作用域：
+	    1. singleton：单例，一个bean容器中只存在一个实例。
+	    2. prototype：每次请求创建新的实例，此时 **destroy方法不生效** ，即对象资源的回收交由应用程序而不是spring框架完成。
+	    3. request：每次http请求创建一个实例，且在当前request中有效。
+	    4. session：每次http请求创建一个实例，且在当前session中有效。
+	    5. global session：在基于portlet的web中有效，否则同session。
+	- scope的默认模式为单例，singleton。
+	```xml
+	 <bean id="beanScope" class="com.hjg.spring.bean.scope.BeanScope" scope="prototype"></bean>
+	```
+- 注解
+	- @Scope默认为singleton。
+	```java
+	@Scope("prototype")
+	public class BeanAnnotation 
+	```
+	- 可以在scope-resolver属性中自定义scope策略，需要实现 **ScopeMetadataResolver** 接口。
+	```xml
+	<context:component-scan base-package="com.hjg.spring.bean.annotation" scope-resolver="xxxxx"/>
+	```
+### 生命周期
+- **实例化**：newInstance分配内存空间
 - **初始化**：
+	- 填充属性。
     - 实现org.springframework.beans.factory.InitializingBean接口，覆盖afterPropertiesSet方法。
     - bean中配置init-method。
     - 各种Aware接口。
@@ -119,46 +115,10 @@ public class BeanAnnotation
     - 实现org.springframework.beans.factory.DisposableBean接口，覆盖destroy方法。
     - bean中配置destroy-method。
     - 实现DisposableBean接口，调用destroy方法。
-```java
-public class BeanLifeCycle implements InitializingBean, DisposableBean{}
-```
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
-  default-init-method="defaultInit" default-destroy-method="defaultDestroy">
-  <bean id="beanLifeCycle" class="com.hjg.spring.bean.lifeCycle.BeanLifeCycle" init-method="start"
-    destroy-method="end">
-  </bean>
-</beans>
-```
-- 通过实现接口的初始化和销毁在配置的初始化和销毁之前执行。
-- 默认的初始化和销毁方法可以不配置，也可以被覆盖。
-
-
-### Aware接口 ###
-- 实现Aware接口的bean在初始化之后可以**获取并操作资源**。
-    - ApplicationContextAware获取并操作applicationContext。
-    - BeanNameAware获取并操作beanName。
-```java
-public class OneApplicationContext implements ApplicationContextAware, BeanNameAware {
-
-    private String beanName;
-    private ApplicationContext applicationContext;
-
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        //初始化bean之后的操作
-        this.applicationContext = applicationContext;
-        System.out.println("bean hashcode: " + applicationContext.getBean(beanName).hashCode());
-    }
-
-
-    public void setBeanName(String name) {
-        this.beanName = name;
-    }
-}
-```
+### 循环依赖问题
+![在这里插入图片描述](https://img-blog.csdnimg.cn/7f97962e866a453bb221a46f3dee56f5.png)
+- 使用多级缓存解决循环依赖 
+- 使用三级缓存而不是二级缓存的原因：未完成的bean可能是简单对象或者aop增强前的对象，也可能是**aop增强**后的对象，需要区分。
 
 ### 自动装配 ###
 #### xml配置 ####
@@ -199,6 +159,28 @@ public class OneApplicationContext implements ApplicationContextAware, BeanNameA
     private BeanInterface beanInterface;
 ```
 
+### Aware接口 ###
+- 实现Aware接口的bean在初始化之后可以**获取并操作资源**。
+    - ApplicationContextAware获取并操作applicationContext。
+    - BeanNameAware获取并操作beanName。
+```java
+public class OneApplicationContext implements ApplicationContextAware, BeanNameAware {
+
+    private String beanName;
+    private ApplicationContext applicationContext;
+
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        //初始化bean之后的操作
+        this.applicationContext = applicationContext;
+        System.out.println("bean hashcode: " + applicationContext.getBean(beanName).hashCode());
+    }
+
+
+    public void setBeanName(String name) {
+        this.beanName = name;
+    }
+}
+```
 ### Resource接口 ###
 - Resource：关于资源文件的统一接口，包括UrlResource, ClassPathResource, FileSystemResource。
 - ResourceLoader：用于获取资源。**ApplicationContext实现** ResourceLoader接口。
@@ -265,6 +247,8 @@ public class ImportConfig
     <property name="JdbcUsername" value="${jdbc.username}"/>
 ```
 
+
+
 ## AOP ##
 - **面向切面编程**（Aspect Oriented Programming, AOP），实现程序功能的统一维护。
     - 主要功能为：日志记录、性能统计、安全控制、事务处理、异常处理等。
@@ -274,13 +258,13 @@ public class ImportConfig
     - SpringAOP：
         - 为纯java实现，没有提供最完整的AOP实现，只支持方法执行**连接点**，这是为了侧重于提供一种AOP实现和IOC容器的**整合**。
         - Spring默认使用jdk动态代理实现AOP，也可以使用cglib代理。
-- 几个概念。<br>![aopContent.png](http://img.blog.csdn.net/20180218141412663)
+- 几个概念。<br>![aopContent.png](https://img-blog.csdnimg.cn/img_convert/904b3ac0ed7d2e11bda57034de7e8935.png)
 - 关键为**切面**,是通知和切点的结合。
     - **通知**：定义切面**做什么**，**何时使用**。
     - **切点**：定义切面在**何处使用**，会匹配通知所需要织入的一个或多个连接点。
 
 ### Advice ###
-- 通知的类型：<br>![aopAdvice.png](http://img.blog.csdn.net/2018021814164999)
+- 通知的类型：<br>![aopAdvice.png](https://img-blog.csdnimg.cn/img_convert/ae37d3e70784e2beb60fb7670060e6a6.png)
 - spring xml的配置：
     - aop:aspect的ref为定义切面的bean的id。
     - aop:pointcut中的expression限定切面的影响范围。也可以在pointcut属性中定义影响范围。
@@ -370,16 +354,16 @@ public class OneAspect
 - 抽象为3个接口。
 
 #### 事务管理器 ####
-- PlatformTransactionManager<br>![PlatformTransactionManager.png](http://img.blog.csdn.net/20180218214650930)
-- 为不同持久层框架提供了不同的事务管理器实现。<br>![TransactionManagerWithDao.png](http://img.blog.csdn.net/20180218215122974)
+- PlatformTransactionManager<br>![PlatformTransactionManager.png](https://img-blog.csdnimg.cn/img_convert/9bf3fe72bbb207a6ae03a535cf4a69eb.png)
+- 为不同持久层框架提供了不同的事务管理器实现。<br>![TransactionManagerWithDao.png](https://img-blog.csdnimg.cn/img_convert/d85fd59de2a4a1d377e6808052b2cad5.png)
 
 #### 事务定义信息 ####
-- TransactionDefinition<br>![TransactionDefinition.png](http://img.blog.csdn.net/20180218215552302)
-- 事务的隔离级别可以不同程度上解决，**脏读**、**不可重复读**、**虚读**（幻读）的问题。mysql默认为REPEATABLE_READ级别。<br>![isolation.png](http://img.blog.csdn.net/20180218220133818)
-- 事务的传播行为可以分为3类，共7种：在一个事务中，不在一个事务中，嵌套事务。<br>![TransactionTransport.png](http://img.blog.csdn.net/20180218220820337)
+- TransactionDefinition<br>![TransactionDefinition.png](https://img-blog.csdnimg.cn/img_convert/08c5810c9249b044c13a897b26cac359.png)
+- 事务的隔离级别可以不同程度上解决，**脏读**、**不可重复读**、**虚读**（幻读）的问题。mysql默认为REPEATABLE_READ级别。<br>![isolation.png](https://img-blog.csdnimg.cn/img_convert/7300d91a87f9788b1de70bad08a16c5f.png)
+- 事务的传播行为可以分为3类，共7种：在一个事务中，不在一个事务中，嵌套事务。<br>![TransactionTransport.png](https://img-blog.csdnimg.cn/img_convert/a18b536486cf59dbcdbdfc9eae56b8ac.png)
 
 #### 事务状态 ####
-- TransactionStatus<br>![TransactionStatus.png](http://img.blog.csdn.net/20180218221223246)
+- TransactionStatus<br>![TransactionStatus.png](https://img-blog.csdnimg.cn/img_convert/d82d3633d57613bbbbd2e595c11bd26b.png)
  
 ### 事务管理 ###
 - 编程式的事务管理。
@@ -400,7 +384,7 @@ public class OneAspect
             }
         });
     }
-``` 
+```
 
 #### 声明式事务管理 ####
 > 3种配置方式。
