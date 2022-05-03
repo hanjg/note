@@ -1,4 +1,5 @@
-[toc]
+
+@[toc]
 ## 特点 ##
 1. sql与代码的分离。
     - 优点：便与管理和维护。
@@ -126,7 +127,7 @@ public interface IMessage {
 ```
 
 ## OGNL表达式 ##
-- OGNL表达式，用于向sql配置文件传递参数,使用#{}取值填充参数，也可以使用java语法（如equals等）。语法如下：<br>![ognl.png](http://img.blog.csdn.net/20180219122814535)<br>![ognl2.png](http://img.blog.csdn.net/20180219122844652)
+- OGNL表达式，用于向sql配置文件传递参数,使用#{}取值填充参数，也可以使用java语法（如equals等）。语法如下：<br>![ognl.png](https://img-blog.csdnimg.cn/img_convert/648a05a480cf7a8c3db9825a8b524f62.png)<br>![ognl2.png](https://img-blog.csdnimg.cn/img_convert/d14d20e846c1f6f385ef733aa3724094.png)
 - 可以使用separator属性，分隔集合中的元素。
 ```xml
   <delete id="deleteBatch" parameterType="java.util.List">
@@ -136,8 +137,8 @@ public interface IMessage {
     </foreach>
     )
   </delete>
-``` 
-- 常用标签。<br>![mark.png](http://img.blog.csdn.net/20180219124053419)
+```
+- 常用标签。<br>![mark.png](https://img-blog.csdnimg.cn/img_convert/bcf0d58721e65bdfcb231d32bd8c5ab0.png)
     - where标签：标签中的都不满足，不添加where关键字。满足则进行格式处理，如删除第一个and。
     - set标签类似where标签，用于update。
     - trim标签,格式字符。
@@ -190,9 +191,24 @@ public interface IMessage {
 - 通过**动态代理**实现。
 - [原理](https://www.imooc.com/video/5896)
 
-### 配置文件加载过程 ###
-- [https://www.imooc.com/video/6639](https://www.imooc.com/video/6639)
-- org.apache.ibatis.type.TypeAliasRegistry中储存了select等标签parameterType属性值和对应的类名。
+### mapper的初始化流程 ##
+#### 代理类工厂的初始化 ####
+> [springboot基于spring.factories的自动装配](https://blog.csdn.net/qq_40369829/article/details/84753616)。
+1. MybatisAutoConfiguration配置在spring.factories文件中，并在容器启动时加载bean的定义。<br>![在这里插入图片描述](https://img-blog.csdnimg.cn/61d5fc8549c24cc185ffc9c222880d59.png)
+2. 容器refresh时在finishBeanFactoryInitialization中创建sqlSessionFactory这个bean
+	1. 创建bean的时候读取mapper的xml配置，位置：org.mybatis.spring.SqlSessionFactoryBean#buildSqlSessionFactory
+	2. 在MapperRegistry中解析mapper，创建代理类工厂MapperProxyFactory，位置：org.apache.ibatis.binding.MapperRegistry#addMapper
+
+#### 代理实例的初始化 ####
+- 依赖mapper的bean初始化时，使用jdk动态代理创建mapper代理类，位置：org.apache.ibatis.binding.MapperProxyFactory#newInstance(org.apache.ibatis.session.SqlSession)
+
+### mapper的执行流程 ###
+- 一次select流程。<br>![190702.exe.png](https://img-blog.csdnimg.cn/20190702224303336.png)
+- 参考。
+	- [mybatis架构](https://blog.csdn.net/luanlouis/article/details/40422941)。
+	- [mybatis深入浅出](https://my.oschina.net/xianggao/blog/548873)。
+	- [springboot集成mybatis](https://www.cnblogs.com/nxzblogs/tag/mybatis/)。
+	- [datasource的加载过程](https://www.cnblogs.com/storml/p/8611388.html)。
 
 ## 实例 ##
 ### 获取自增主键值 ###

@@ -1,4 +1,7 @@
-[toc]
+
+
+
+@[toc]
 ## spring boot 核心 ##
 - 其设计目的是用来简化新spring应用的初始搭建以及开发过程。
 - 从本质上说，spring boot就是spring，只是利用了spring4的**条件化配置特性**和maven或者gradle提供的**传递依赖解析**，实现spring应用程序上下文里的自动配置。
@@ -360,6 +363,15 @@ label {
 - 直接运行启动类(也可以打包成jar或者war)。<br>![181202.run.png](https://img-blog.csdnimg.cn/20181202231316678.png)
 - 访问localhost:8080/readingList/reader1<br>![181202.web.png](https://img-blog.csdnimg.cn/20181202231720934.png)
 
+## 实现原理
+### 启动流程
+![在这里插入图片描述](https://img-blog.csdnimg.cn/0bb5651b8c8d4c0cab7638ac1e49eafe.png)
+- springboot在spring基础上通过**BeanFactoryPostProcessor**扩展自动装配。[参考](https://www.cnblogs.com/trgl/p/7353782.html)。
+### 自动装配
+1. 启动类的 @SpringBootApplication注解继承@EnableAutoConfiguration，改注解在@Import注解中引入AutoConfigurationImportSelector.class
+2. 容器refresh时，在invokeBeanFactoryPostProcessors底层读取启动类的@Import注解，读取的位置：org.springframework.boot.autoconfigure.AutoConfigurationImportSelector#getAnnotationClass
+3. AutoConfigurationImportSelector实现ImportSelector接口的selectImports方法，在```META-INF/spring.factories```下读取org.springframework.boot.autoconfigure.EnableAutoConfiguration的实现类。
+4. 这些实现类包含@Configuration注解，返回该类中@Bean注解声明的bean
 
 ## spring boot参考资料 ##
 - [springboot系列](https://blog.csdn.net/Winter_chen001/article/details/80537829)
