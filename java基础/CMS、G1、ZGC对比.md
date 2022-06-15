@@ -1,4 +1,5 @@
-[toc]
+
+@[toc]
 ## CMS+ParNew ##
 - 一块eden,两块survivor，一块old。
 
@@ -15,9 +16,11 @@
 - 结束后。<br>![210317.cms.old.2.png](https://img-blog.csdnimg.cn/20210319003752329.png)
 
 ### 优缺点 ###
-- 并发高效。
-- 老年代并发清理碎片多。
-- 停顿时间无上限。
+- 优点：
+	- 并发高效。
+- 缺点：
+	- 老年代标记清除碎片多。
+	- 停顿时间无上限。
 
 ## G1 ##
 - 堆被分成多个大小的区域。映射为不连续的eden,survivor,old。
@@ -38,10 +41,22 @@
 - 结束后。<br>![210317.g1.old.3.png](https://img-blog.csdnimg.cn/20210319004042578.png)
 
 ### 优缺点 ###
-- 最大停顿时间可预测。每次处理部分堆实现停顿时间限制。
-- 老年代也复制，碎片有限。
-- 写屏障，维护[RememberedSet](https://blog.csdn.net/FMC_WBL/article/details/107864334)，且Rset占据空间较多，5-20%。
-  - RememberedSet：point-into结构，key：引用的region地址，value：引用的对象[卡页](https://blog.csdn.net/luzhensmart/article/details/106052574)集合
+- 优点：
+	- 最大停顿时间可预测。每次处理部分堆，实现停顿时间限制。
+	- 老年代也会复制，碎片有限。
+- 缺点
+  - **RememberedSet**占据空间较多，5-20%
+  - **写屏障**（在引用对象进行赋值时的切面），维护[RememberedSet](https://blog.csdn.net/FMC_WBL/article/details/107864334)
+
+#### Rset
+- 为了每次GC只**扫描部分老年代**，需要记录old其他region的跨代引用，可达性分析的时候只扫描有跨代引用的老年代region
+- 跨region引用的**摘要**，**point-into**数据结构，Map类型
+	- k：引用该young region的 **old region地址**
+	- v：**该old的卡表**-卡页索引，```CARD_TABLE[this address >> 9] ```	
+		- 	卡页：标记old的内存块中是否有对该young的引用，有则为脏卡页
+![在这里插入图片描述](https://img-blog.csdnimg.cn/a3d28e60c5d94d3cafb1dd8cddc932b1.png)
+- 不保存来自young引用的原因: young的新对象多，基本所有region都会有待回收的对象，都需要遍历，没有必要用额外的空间维护reset
+
 
 ## ZGC ##
 - 不分代。
@@ -53,7 +68,8 @@
     - 使用3个bit标识3种视图和存活信息：M0,M1,Remapped。<br>![210318.zgc.pointer.png](https://img-blog.csdnimg.cn/20210319004133187.png)
   - 读屏障。应用线程**从堆中读取对象引用**时触发。
     - ZGC用来标记和转移过程中确定对象引用地址是否满足条件，并作出修改对象视图等操作。
-
+> [三色标记法](https://github.com/crisxuan/bestJavaer/blob/master/jvm/jvm-interviewanswer.md#%E4%BB%80%E4%B9%88%E6%98%AF%E4%B8%89%E8%89%B2%E6%A0%87%E8%AE%B0%E6%B3%95%E4%B8%89%E8%89%B2%E6%A0%87%E8%AE%B0%E6%B3%95%E4%BC%9A%E9%80%A0%E6%88%90%E5%93%AA%E4%BA%9B%E9%97%AE%E9%A2%98)
+> [三色标记法问题](https://blog.csdn.net/FMC_WBL/article/details/107864334)：并发情况下的漏标、错标
 ### 过程 ###
 - 初始化。视图为Remapped。
 - 标记阶段。
@@ -63,10 +79,12 @@
 - 第二次GC标记阶段的活跃对象视图为M1，M0和Remapped均为不活跃对象。<br>![210318.zgc.2.png](https://img-blog.csdnimg.cn/2021031900413398.png)
 
 ### 优缺点 ###
-- 停顿时间短，通常1ms左右。
-- 吞吐量下降。
-  - 单代回收每次处理的对象更多。
-  - 读屏障cpu开销。
+- 优点：
+	- 停顿时间短，通常1ms左右。
+- 缺点：
+	- 吞吐量下降。
+	  - 单代回收每次处理的对象更多。
+	  - 读屏障cpu开销。
 
 ## 参考 ##
 - [G1垃圾收集器入门](https://blog.csdn.net/renfufei/article/details/41897113)
@@ -75,3 +93,4 @@
 - [三种收集器对比](https://www.cnblogs.com/cmt/p/14553189.html)
 - [jvm一些参数收集和g1简单认知](https://www.jianshu.com/p/70273489db66)
 - [垃圾优先型垃圾回收器调优](https://www.oracle.com/cn/technical-resources/articles/java/g1gc.html)
+- [JVM面试题总结](https://github.com/crisxuan/bestJavaer/blob/master/jvm/jvm-interviewanswer.md)
